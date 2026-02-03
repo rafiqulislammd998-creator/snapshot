@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SnapNote - আপনার ডিজিটাল নোটবুক</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@700&display=swap');
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #151515;
+            --bg-tertiary: #1f1f1f;
+            --accent: #00ff88;
+            --accent-dim: #00ff8833;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: #2a2a2a;
+            --error: #ff4444;
+            --warning: #ffaa00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #00ddff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .icon-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+        }
+        
+        .icon-btn:active {
+            transform: scale(0.95);
+            background: var(--bg-primary);
+        }
+        
+        .icon-btn.primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+        
+        /* Search Bar */
+        .search-container {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 3rem 0.875rem 2.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        
+        .clear-search {
+            position: absolute;
+            right: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: none;
+        }
+        
+        .clear-search.show {
+            display: block;
+        }
+        
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: none;
+        }
+        
+        .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-tab.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+        
+        /* Notes Grid */
+        .notes-container {
+            padding: 1rem;
+            min-height: calc(100vh - 250px);
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        
+        .note-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .note-card:active {
+            transform: scale(0.98);
+        }
+        
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .note-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        
+        .note-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .note-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+            font-size: 1rem;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        
+        .note-card:hover .note-action-btn {
+            opacity: 1;
+        }
+        
+        .note-content {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .note-tags {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            padding: 0.25rem 0.625rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .note-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .note-thumbnail {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        
+        .modal-body {
+            padding: 1.25rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        
+        textarea.form-input {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.625rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-height: 45px;
+        }
+        
+        .tag-input-container:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.625rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+        
+        .tag-remove {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .tag-input {
+            flex: 1;
+            min-width: 120px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+        }
+        
+        .snapshot-preview {
+            margin-top: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .snapshot-preview img {
+            width: 100%;
+            display: block;
+        }
+        
+        .modal-footer {
+            padding: 1.25rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 0.875rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:active {
+            background: var(--bg-primary);
+        }
+        
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+        
+        /* Snapshot Canvas */
+        #snapshotCanvas {
+            position: fixed;
+            top: -10000px;
+            left: -10000px;
+        }
+        
+        /* Stats */
+        .stats-bar {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">SnapNote</div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleView()" title="ভিউ পরিবর্তন">
+                <span id="viewIcon">📊</span>
+            </button>
+            <button class="icon-btn primary" onclick="openNewNoteModal()" title="নতুন নোট">
+                ➕
+            </button>
+        </div>
+    </header>
+
+    <!-- Search -->
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="নোট খুঁজুন...">
+            <button class="clear-search" id="clearSearch" onclick="clearSearch()">✕</button>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-filter="all">সব নোট</button>
+        <button class="filter-tab" data-filter="recent">সাম্প্রতিক</button>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stats-item">
+            <span>📝</span>
+            <span id="noteCount">0</span>
+            <span>নোট</span>
+        </div>
+        <div class="stats-item">
+            <span>🏷️</span>
+            <span id="tagCount">0</span>
+            <span>ট্যাগ</span>
+        </div>
+    </div>
+
+    <!-- Notes Container -->
+    <div class="notes-container">
+        <div class="notes-grid" id="notesGrid">
+            <!-- Notes will be dynamically added here -->
+        </div>
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">📝</div>
+            <h3>কোন নোট নেই</h3>
+            <p>নতুন নোট তৈরি করে শুরু করুন</p>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">নতুন নোট</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="noteForm" onsubmit="saveNote(event)">
+                    <div class="form-group">
+                        <label class="form-label">শিরোনাম</label>
+                        <input type="text" class="form-input" id="noteTitle" required placeholder="নোটের শিরোনাম লিখুন...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">বিষয়বস্তু</label>
+                        <textarea class="form-input" id="noteContent" required placeholder="আপনার নোট লিখুন..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ট্যাগ (Enter চাপুন)</label>
+                        <div class="tag-input-container" id="tagContainer">
+                            <input type="text" class="tag-input" id="tagInput" placeholder="ট্যাগ যোগ করুন...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary" onclick="captureSnapshot()">
+                            📸 নোটের স্ন্যাপশট নিন
+                        </button>
+                        <div id="snapshotPreview" class="snapshot-preview" style="display: none;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">বাতিল</button>
+                <button class="btn btn-primary" onclick="saveNote(event)">সংরক্ষণ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Note Modal -->
+    <div class="modal" id="viewNoteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewNoteTitle"></h3>
+                <button class="modal-close" onclick="closeViewModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="viewNoteSnapshot" style="display: none; margin-bottom: 1rem;">
+                    <img style="width: 100%; border-radius: 8px; border: 1px solid var(--border);">
+                </div>
+                <div id="viewNoteContent" style="line-height: 1.8; color: var(--text-primary);"></div>
+                <div id="viewNoteTags" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;"></div>
+                <div id="viewNoteDate" style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="deleteCurrentNote()">মুছুন</button>
+                <button class="btn btn-secondary" onclick="editCurrentNote()">সম্পাদনা</button>
+                <button class="btn btn-primary" onclick="downloadNoteImage()">ডাউনলোড</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Canvas for Snapshot -->
+    <canvas id="snapshotCanvas"></canvas>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // State Management
+        let notes = [];
+        let currentNoteId = null;
+        let currentTags = [];
+        let currentSnapshot = null;
+        let allTags = new Set();
+        let currentFilter = 'all';
+        let currentView = 'grid';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes();
+            setupEventListeners();
+            renderNotes();
+            updateStats();
+        });
+
+        function setupEventListeners() {
+            // Search
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            
+            // Tag input
+            document.getElementById('tagInput').addEventListener('keydown', handleTagInput);
+            
+            // Filter tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderNotes();
+                });
+            });
+        }
+
+        // Storage Functions
+        function loadNotes() {
+            const stored = localStorage.getItem('snapnotes');
+            if (stored) {
+                notes = JSON.parse(stored);
+                notes.forEach(note => {
+                    if (note.tags) {
+                        note.tags.forEach(tag => allTags.add(tag));
+                    }
+                });
+                updateFilterTabs();
+            }
+        }
+
+        function saveNotes() {
+            localStorage.setItem('snapnotes', JSON.stringify(notes));
+        }
+
+        // Modal Functions
+        function openNewNoteModal() {
+            currentNoteId = null;
+            currentTags = [];
+            currentSnapshot = null;
+            document.getElementById('modalTitle').textContent = 'নতুন নোট';
+            document.getElementById('noteForm').reset();
+            document.getElementById('tagContainer').innerHTML = '<input type="text" class="tag-input" id="tagInput" placeholder="ট্যাগ যোগ করুন...">';
+            document.getElementById('snapshotPreview').style.display = 'none';
+            document.getElementById('noteModal').classList.add('show');
+            setupEventListeners();
+        }
+
+        function closeModal() {
+            document.getElementById('noteModal').classList.remove('show');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewNoteModal').classList.remove('show');
+        }
+
+        // Tag Management
+        function handleTagInput(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const input = e.target;
+                const value = input.value.trim();
+                if (value && !currentTags.includes(value)) {
+                    currentTags.push(value);
+                    renderTagInput();
+                    input.value = '';
+                }
+            }
+        }
+
+        function removeTag(tag) {
+            currentTags = currentTags.filter(t => t !== tag);
+            renderTagInput();
+        }
+
+        function renderTagInput() {
+            const container = document.getElementById('tagContainer');
+            container.innerHTML = currentTags.map(tag => 
+                `<div class="tag-item">
+                    <span>${tag}</span>
+                    <button type="button" class="tag-remove" onclick="removeTag('${tag}')">✕</button>
+                </div>`
+            ).join('') + '<input type="text" class="tag-input" id="tagInput" placeholder="ট্যাগ যোগ করুন...">';
+            
+            document.getElementById('tagInput').addEventListener('keydown', handleTagInput);
+        }
+
+        // Snapshot Functions
+        function captureSnapshot() {
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+            
+            if (!title || !content) {
+                showToast('শিরোনাম এবং বিষয়বস্তু প্রয়োজন');
+                return;
+            }
+
+            const canvas = document.getElementById('snapshotCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = 800;
+            canvas.height = 600;
+            
+            // Background
+            ctx.fillStyle = '#151515';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Accent bar
+            ctx.fillStyle = '#00ff88';
+            ctx.fillRect(0, 0, 10, canvas.height);
+            
+            // Title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 36px IBM Plex Sans, sans-serif';
+            ctx.fillText(title, 40, 80);
+            
+            // Line under title
+            ctx.fillStyle = '#2a2a2a';
+            ctx.fillRect(40, 100, canvas.width - 80, 2);
+            
+            // Content
+            ctx.fillStyle = '#a0a0a0';
+            ctx.font = '20px IBM Plex Sans, sans-serif';
+            
+            const words = content.split(' ');
+            let line = '';
+            let y = 150;
+            const maxWidth = canvas.width - 80;
+            const lineHeight = 35;
+            
+            for (let word of words) {
+                const testLine = line + word + ' ';
+                const metrics = ctx.measureText(testLine);
+                
+                if (metrics.width > maxWidth && line !== '') {
+                    ctx.fillText(line, 40, y);
+                    line = word + ' ';
+                    y += lineHeight;
+                    
+                    if (y > canvas.height - 100) break;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, 40, y);
+            
+            // Tags
+            if (currentTags.length > 0) {
+                y = canvas.height - 60;
+                ctx.font = '16px IBM Plex Sans, sans-serif';
+                let x = 40;
+                
+                currentTags.forEach(tag => {
+                    const tagWidth = ctx.measureText(tag).width + 30;
+                    
+                    // Tag background
+                    ctx.fillStyle = '#1f1f1f';
+                    ctx.fillRect(x, y - 20, tagWidth, 30);
+                    
+                    // Tag border
+                    ctx.strokeStyle = '#2a2a2a';
+                    ctx.strokeRect(x, y - 20, tagWidth, 30);
+                    
+                    // Tag text
+                    ctx.fillStyle = '#00ff88';
+                    ctx.fillText(tag, x + 15, y);
+                    
+                    x += tagWidth + 10;
+                });
+            }
+            
+            // Date
+            ctx.fillStyle = '#666666';
+            ctx.font = '14px IBM Plex Sans, sans-serif';
+            ctx.fillText(new Date().toLocaleDateString('bn-BD'), 40, canvas.height - 20);
+            
+            // Convert to image
+            currentSnapshot = canvas.toDataURL('image/png');
+            
+            // Show preview
+            const preview = document.getElementById('snapshotPreview');
+            preview.innerHTML = `<img src="${currentSnapshot}" alt="Preview">`;
+            preview.style.display = 'block';
+            
+            showToast('স্ন্যাপশট তৈরি হয়েছে');
+        }
+
+        // Note CRUD
+        function saveNote(e) {
+            if (e) e.preventDefault();
+            
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            
+            if (!title || !content) {
+                showToast('শিরোনাম এবং বিষয়বস্তু প্রয়োজন');
+                return;
+            }
+            
+            const note = {
+                id: currentNoteId || Date.now(),
+                title,
+                content,
+                tags: currentTags,
+                snapshot: currentSnapshot,
+                createdAt: currentNoteId ? notes.find(n => n.id === currentNoteId).createdAt : Date.now(),
+                updatedAt: Date.now()
+            };
+            
+            if (currentNoteId) {
+                const index = notes.findIndex(n => n.id === currentNoteId);
+                notes[index] = note;
+                showToast('নোট আপডেট হয়েছে');
+            } else {
+                notes.unshift(note);
+                showToast('নোট সংরক্ষিত হয়েছে');
+            }
+            
+            currentTags.forEach(tag => allTags.add(tag));
+            saveNotes();
+            updateFilterTabs();
+            renderNotes();
+            updateStats();
+            closeModal();
+        }
+
+        function viewNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            
+            currentNoteId = id;
+            document.getElementById('viewNoteTitle').textContent = note.title;
+            document.getElementById('viewNoteContent').textContent = note.content;
+            
+            if (note.snapshot) {
+                const snapshotDiv = document.getElementById('viewNoteSnapshot');
+                snapshotDiv.querySelector('img').src = note.snapshot;
+                snapshotDiv.style.display = 'block';
+            } else {
+                document.getElementById('viewNoteSnapshot').style.display = 'none';
+            }
+            
+            const tagsDiv = document.getElementById('viewNoteTags');
+            tagsDiv.innerHTML = note.tags.map(tag => 
+                `<span class="tag">${tag}</span>`
+            ).join('');
+            
+            document.getElementById('viewNoteDate').textContent = 
+                'তৈরি: ' + new Date(note.createdAt).toLocaleDateString('bn-BD');
+            
+            document.getElementById('viewNoteModal').classList.add('show');
+        }
+
+        function editCurrentNote() {
+            const note = notes.find(n => n.id === currentNoteId);
+            if (!note) return;
+            
+            closeViewModal();
+            
+            document.getElementById('modalTitle').textContent = 'নোট সম্পাদনা';
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteContent').value = note.content;
+            currentTags = [...note.tags];
+            currentSnapshot = note.snapshot;
+            
+            renderTagInput();
+            
+            if (note.snapshot) {
+                const preview = document.getElementById('snapshotPreview');
+                preview.innerHTML = `<img src="${note.snapshot}" alt="Preview">`;
+                preview.style.display = 'block';
+            }
+            
+            document.getElementById('noteModal').classList.add('show');
+        }
+
+        function deleteCurrentNote() {
+            if (!confirm('এই নোটটি মুছে ফেলতে চান?')) return;
+            
+            notes = notes.filter(n => n.id !== currentNoteId);
+            saveNotes();
+            renderNotes();
+            updateStats();
+            closeViewModal();
+            showToast('নোট মুছে ফেলা হয়েছে');
+        }
+
+        function downloadNoteImage() {
+            const note = notes.find(n => n.id === currentNoteId);
+            if (!note || !note.snapshot) {
+                showToast('কোন স্ন্যাপশট নেই');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.download = `${note.title.replace(/\s+/g, '_')}.png`;
+            link.href = note.snapshot;
+            link.click();
+            
+            showToast('ডাউনলোড শুরু হয়েছে');
+        }
+
+        // Render Functions
+        function renderNotes() {
+            let filteredNotes = [...notes];
+            
+            // Apply filter
+            if (currentFilter !== 'all') {
+                if (currentFilter === 'recent') {
+                    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+                    filteredNotes = filteredNotes.filter(n => n.createdAt > weekAgo);
+                } else {
+                    filteredNotes = filteredNotes.filter(n => n.tags.includes(currentFilter));
+                }
+            }
+            
+            // Apply search
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filteredNotes = filteredNotes.filter(n => 
+                    n.title.toLowerCase().includes(searchTerm) ||
+                    n.content.toLowerCase().includes(searchTerm) ||
+                    n.tags.some(t => t.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            const grid = document.getElementById('notesGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredNotes.length === 0) {
+                grid.innerHTML = '';
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+                grid.innerHTML = filteredNotes.map(note => `
+                    <div class="note-card" onclick="viewNote(${note.id})">
+                        ${note.snapshot ? `<img src="${note.snapshot}" class="note-thumbnail">` : ''}
+                        <div class="note-header">
+                            <div class="note-title">${note.title}</div>
+                        </div>
+                        <div class="note-content">${note.content}</div>
+                        <div class="note-footer">
+                            <div class="note-tags">
+                                ${note.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                            <div class="note-date">${formatDate(note.createdAt)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateFilterTabs() {
+            const tabs = document.getElementById('filterTabs');
+            const tagTabs = Array.from(allTags).sort().map(tag => 
+                `<button class="filter-tab" data-filter="${tag}">${tag}</button>`
+            ).join('');
+            
+            tabs.innerHTML = `
+                <button class="filter-tab active" data-filter="all">সব নোট</button>
+                <button class="filter-tab" data-filter="recent">সাম্প্রতিক</button>
+                ${tagTabs}
+            `;
+            
+            tabs.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderNotes();
+                });
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('noteCount').textContent = notes.length;
+            document.getElementById('tagCount').textContent = allTags.size;
+        }
+
+        // Search
+        function handleSearch(e) {
+            const value = e.target.value;
+            const clearBtn = document.getElementById('clearSearch');
+            
+            if (value) {
+                clearBtn.classList.add('show');
+            } else {
+                clearBtn.classList.remove('show');
+            }
+            
+            renderNotes();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearch').classList.remove('show');
+            renderNotes();
+        }
+
+        // View Toggle
+        function toggleView() {
+            currentView = currentView === 'grid' ? 'list' : 'grid';
+            document.getElementById('viewIcon').textContent = currentView === 'grid' ? '📊' : '📝';
+            renderNotes();
+        }
+
+        // Utilities
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (days === 0) return 'আজ';
+            if (days === 1) return 'গতকাল';
+            if (days < 7) return `${days} দিন আগে`;
+            
+            return date.toLocaleDateString('bn-BD');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
