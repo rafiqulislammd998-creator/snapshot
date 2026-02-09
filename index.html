@@ -3,260 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="SnapNote - Your modern digital notebook with visual snapshots">
-    <meta name="theme-color" content="#0a0a0a">
-    <title>SnapNote - Visual Digital Notebook</title>
+    <meta name="theme-color" content="#0a0e27">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="NoteVerse - Your elegant digital notebook for capturing thoughts, memories, and moments">
+    <title>NoteVerse - Digital Notebook</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap');
-        
         :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #151515;
-            --bg-tertiary: #1f1f1f;
-            --accent: #00ff88;
-            --accent-dim: #00ff8833;
-            --accent-hover: #00dd77;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --border: #2a2a2a;
-            --error: #ff4444;
-            --warning: #ffaa00;
-            --success: #00ff88;
+            --bg-primary: #0a0e27;
+            --bg-secondary: #141b3d;
+            --bg-tertiary: #1a2346;
+            --bg-card: #1e2749;
+            --bg-hover: #252d52;
+            --text-primary: #e8eaf6;
+            --text-secondary: #b8bfd9;
+            --text-muted: #7c85a8;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --border: rgba(139, 92, 246, 0.1);
+            --border-hover: rgba(139, 92, 246, 0.3);
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-lg: rgba(0, 0, 0, 0.5);
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            position: relative;
         }
-        
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         /* Header */
-        .header {
+        header {
+            background: rgba(20, 27, 61, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(21, 21, 21, 0.95);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem;
+            box-shadow: 0 4px 30px var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo-section {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            gap: 1rem;
         }
-        
+
         .logo {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), #00ddff);
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.02em;
+            line-height: 1;
         }
-        
+
+        .brand-tagline {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 0.25rem;
+        }
+
         .header-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 1rem;
             align-items: center;
         }
-        
-        .sync-status {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            margin-right: 0.5rem;
-        }
-        
-        .sync-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent);
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .icon-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            width: 42px;
-            height: 42px;
+
+        .btn {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
             border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px var(--accent-glow);
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1.2rem;
-            user-select: none;
-        }
-        
-        .icon-btn:hover {
-            background: var(--bg-primary);
-            border-color: var(--accent);
-        }
-        
-        .icon-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .icon-btn.primary {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border-color: var(--accent);
-            font-weight: 600;
-        }
-        
-        .icon-btn.primary:hover {
-            background: var(--accent-hover);
-        }
-        
-        /* Search Bar */
-        .search-container {
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .search-box {
+            gap: 0.5rem;
+            white-space: nowrap;
             position: relative;
+            overflow: hidden;
         }
-        
-        .search-input {
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
-            padding: 0.875rem 3rem 0.875rem 2.75rem;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-icon {
             background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
             color: var(--text-primary);
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            font-family: inherit;
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            border: 1px solid var(--border);
+            box-shadow: none;
         }
-        
-        .search-input::placeholder {
-            color: var(--text-secondary);
+
+        .btn-icon:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+            transform: scale(1.05);
         }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-dim);
+
+        /* Search */
+        .search-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        
+
+        .search-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
         .search-icon {
             position: absolute;
-            left: 1rem;
+            left: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-secondary);
-            pointer-events: none;
-            font-size: 1.1rem;
-        }
-        
-        .clear-search {
-            position: absolute;
-            right: 0.875rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--bg-secondary);
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
+            color: var(--text-muted);
             font-size: 1.2rem;
-            display: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
         }
-        
-        .clear-search:hover {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
-        
-        .clear-search.show {
-            display: flex;
-        }
-        
-        /* Filter Tabs */
-        .filter-tabs {
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            padding: 0.875rem 1rem;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .filter-tabs::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .filter-tab {
-            padding: 0.625rem 1.125rem;
-            background: var(--bg-tertiary);
+
+        #searchInput {
+            width: 100%;
+            padding: 1.25rem 1.25rem 1.25rem 3.5rem;
             border: 1px solid var(--border);
-            border-radius: 20px;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-        
-        .filter-tab:hover {
-            border-color: var(--accent);
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-card);
             color: var(--text-primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--shadow);
         }
-        
-        .filter-tab.active {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border-color: var(--accent);
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 30px var(--accent-glow), 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
-        
+
+        #searchInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Stats */
+        .stats {
+            padding: 0 2rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.75rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-hover);
+            box-shadow: 0 8px 30px var(--shadow-lg);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Playfair Display', serif;
+        }
+
         /* Notes Grid */
         .notes-container {
-            padding: 1rem;
-            min-height: calc(100vh - 280px);
+            padding: 0 2rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex: 1;
         }
-        
+
         .notes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            animation: fadeIn 0.4s ease-out;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            animation: fadeIn 0.5s ease;
         }
-        
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -267,137 +338,293 @@
                 transform: translateY(0);
             }
         }
-        
+
         .note-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1.125rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
+            background: var(--bg-card);
+            border-radius: 15px;
             overflow: hidden;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            animation: slideIn 0.5s ease;
+            position: relative;
         }
-        
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .note-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
+            width: 100%;
             height: 100%;
-            background: var(--accent);
+            background: var(--accent-gradient);
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
-        
-        .note-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.1);
-        }
-        
+
         .note-card:hover::before {
-            opacity: 1;
+            opacity: 0.05;
         }
-        
-        .note-card:active {
-            transform: scale(0.98);
+
+        .note-card:hover {
+            box-shadow: 0 12px 40px var(--shadow-lg);
+            transform: translateY(-8px);
+            border-color: var(--border-hover);
         }
-        
-        .note-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.875rem;
-        }
-        
-        .note-title {
-            font-weight: 600;
-            font-size: 1.1rem;
-            line-height: 1.4;
-            color: var(--text-primary);
-            flex: 1;
-            margin-right: 0.5rem;
-        }
-        
-        .note-content {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.7;
-            margin-bottom: 0.875rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
+
+        .note-images {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            max-height: 280px;
             overflow: hidden;
         }
-        
-        .note-footer {
+
+        .note-image-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .note-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .note-image-wrapper:hover .note-image {
+            transform: scale(1.15);
+        }
+
+        .note-content {
+            padding: 1.5rem;
+        }
+
+        .note-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .note-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            max-height: 5.1em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .note-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 0.875rem;
-            padding-top: 0.875rem;
+            gap: 1rem;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
             border-top: 1px solid var(--border);
-        }
-        
-        .note-tags {
-            display: flex;
-            gap: 0.375rem;
             flex-wrap: wrap;
-            flex: 1;
         }
-        
-        .tag {
-            padding: 0.3rem 0.75rem;
+
+        .note-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .note-date::before {
+            content: '🕐';
+            font-size: 0.9rem;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .note-btn {
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            font-size: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            border-radius: 8px;
             color: var(--text-secondary);
-            font-weight: 500;
         }
-        
-        .note-date {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            margin-left: 0.5rem;
+
+        .note-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+            transform: scale(1.1);
         }
-        
-        .note-thumbnail {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 0.875rem;
-            border: 1px solid var(--border);
+
+        .note-btn.delete:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
         }
-        
+
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 4rem 1rem;
-            color: var(--text-secondary);
+            padding: 5rem 2rem;
+            color: var(--text-muted);
         }
-        
+
         .empty-icon {
             font-size: 5rem;
             margin-bottom: 1.5rem;
-            opacity: 0.2;
-            filter: grayscale(1);
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
         }
-        
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
         .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
         }
-        
+
         .empty-state p {
-            font-size: 0.95rem;
+            font-size: 1rem;
+            color: var(--text-muted);
         }
-        
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+            box-shadow: 0 -4px 30px var(--shadow);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-primary);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .social-icon:hover {
+            background: var(--accent-gradient);
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            background: var(--bg-primary);
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-bottom a:hover {
+            text-decoration: underline;
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -406,1232 +633,1189 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
-            animation: fadeIn 0.2s;
-            align-items: center;
+            animation: fadeInModal 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
             justify-content: center;
+            align-items: center;
             padding: 1rem;
         }
-        
-        .modal.show {
-            display: flex;
-        }
-        
+
         .modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            width: 100%;
+            background: var(--bg-card);
+            border-radius: 20px;
             max-width: 650px;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            animation: slideUp 0.3s ease-out;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 60px var(--shadow-lg);
+            border: 1px solid var(--border);
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(50px);
+                transform: translateY(50px) scale(0.9);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
-        
+
         .modal-header {
-            padding: 1.5rem;
+            padding: 2rem;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
             background: var(--bg-secondary);
-            z-index: 10;
         }
-        
+
         .modal-title {
-            font-weight: 600;
-            font-size: 1.35rem;
-            color: var(--text-primary);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .modal-close {
+
+        .close-modal {
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
             font-size: 1.5rem;
             cursor: pointer;
-            padding: 0.375rem;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            color: var(--text-secondary);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
-        
-        .modal-close:hover {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            border-color: var(--accent);
+
+        .close-modal:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+            transform: rotate(90deg);
         }
-        
+
         .modal-body {
-            padding: 1.5rem;
+            padding: 2rem;
         }
-        
+
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
         }
-        
-        .form-label {
+
+        label {
             display: block;
-            margin-bottom: 0.625rem;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 0.875rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
             color: var(--text-primary);
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: all 0.2s;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        
-        .form-input::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.6;
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
-        
-        .form-input:focus {
+
+        input[type="text"]:focus,
+        textarea:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-dim);
+            border-color: var(--accent-primary);
+            background: var(--bg-secondary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
-        
-        textarea.form-input {
+
+        textarea {
             min-height: 180px;
             resize: vertical;
             line-height: 1.7;
         }
-        
-        .tag-input-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.75rem;
+
+        .image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
             background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            min-height: 48px;
-            transition: all 0.2s;
         }
-        
-        .tag-input-container:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-dim);
+
+        .image-upload-area:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-secondary);
         }
-        
-        .tag-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.75rem;
-            background: var(--accent);
-            color: var(--bg-primary);
-            border-radius: 14px;
-            font-size: 0.875rem;
+
+        .image-upload-area.dragover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+            border-style: solid;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
             font-weight: 500;
-            animation: popIn 0.2s ease-out;
         }
-        
-        @keyframes popIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+
+        input[type="file"] {
+            display: none;
         }
-        
-        .tag-remove {
-            background: rgba(0, 0, 0, 0.2);
+
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .image-preview-wrapper {
+            position: relative;
+            padding-bottom: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .image-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--danger);
+            color: white;
             border: none;
-            color: inherit;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
             cursor: pointer;
             font-size: 1rem;
-            padding: 0;
-            line-height: 1;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-        
-        .tag-remove:hover {
-            background: rgba(0, 0, 0, 0.4);
+
+        .remove-image:hover {
+            transform: scale(1.15);
+            background: #dc2626;
         }
-        
-        .tag-input {
-            flex: 1;
-            min-width: 140px;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            outline: none;
-            font-family: inherit;
-        }
-        
-        .snapshot-preview {
-            margin-top: 1rem;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .snapshot-preview img {
-            width: 100%;
-            display: block;
-        }
-        
+
         .modal-footer {
-            padding: 1.5rem;
+            padding: 1.5rem 2rem;
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 0.875rem;
-            position: sticky;
-            bottom: 0;
+            gap: 1rem;
+            justify-content: flex-end;
             background: var(--bg-secondary);
         }
-        
-        .btn {
-            flex: 1;
-            padding: 0.875rem 1.25rem;
-            border-radius: 10px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-family: inherit;
-            user-select: none;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-primary {
-            background: var(--accent);
-            color: var(--bg-primary);
-        }
-        
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
-        }
-        
+
         .btn-secondary {
             background: var(--bg-tertiary);
             color: var(--text-primary);
             border: 1px solid var(--border);
+            box-shadow: none;
         }
-        
+
         .btn-secondary:hover {
-            background: var(--bg-primary);
-            border-color: var(--accent);
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
         }
-        
-        .btn-danger {
-            background: var(--error);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #dd3333;
-        }
-        
-        /* Snapshot Canvas */
-        #snapshotCanvas {
+
+        /* Image Lightbox */
+        .lightbox {
+            display: none;
             position: fixed;
-            top: -10000px;
-            left: -10000px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.98);
+            z-index: 2000;
+            animation: fadeInModal 0.3s ease;
         }
-        
-        /* Stats */
-        .stats-bar {
-            padding: 0.875rem 1rem;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
+
+        .lightbox.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+            background: linear-gradient(to bottom, rgba(10, 14, 39, 0.9), transparent);
+            z-index: 10;
         }
-        
-        .stats-item {
+
+        .lightbox-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .lightbox-close {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lightbox-close:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .lightbox-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5rem 1rem 7rem;
+        }
+
+        .lightbox-image-container {
+            position: relative;
+            max-width: 100%;
+            max-height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+            border-radius: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-image.zoomed {
+            cursor: zoom-out;
+            transform: scale(2);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: white;
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lightbox-nav:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lightbox-nav.prev {
+            left: 2rem;
+        }
+
+        .lightbox-nav.next {
+            right: 2rem;
+        }
+
+        .lightbox-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .lightbox-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+            background: linear-gradient(to top, rgba(10, 14, 39, 0.9), transparent);
+        }
+
+        .lightbox-counter {
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.2);
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .lightbox-controls {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .lightbox-btn {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
         }
-        
-        .stats-item strong {
-            color: var(--accent);
-            font-weight: 600;
+
+        .lightbox-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
         }
-        
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 1rem 1.75rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            opacity: 0;
-            transition: all 0.3s ease-out;
-            font-weight: 500;
+
+        .lightbox-thumbnails {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding: 0.75rem;
+            max-width: 100%;
         }
-        
-        .toast.show {
+
+        .lightbox-thumbnail {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .lightbox-thumbnail:hover {
+            opacity: 0.8;
+        }
+
+        .lightbox-thumbnail.active {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
         }
-        
-        .toast.success {
-            border-color: var(--accent);
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
         }
-        
-        .toast.error {
-            border-color: var(--error);
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
         }
-        
-        /* Loading Spinner */
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-gradient);
+            border-radius: 5px;
         }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
+            .brand-name {
+                font-size: 1.4rem;
+            }
+
+            .brand-tagline {
+                font-size: 0.65rem;
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px;
+                font-size: 1.4rem;
+            }
+
+            .header-content {
+                padding: 1rem 1.5rem;
+            }
+
+            .btn-text {
+                display: none;
+            }
+
             .notes-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .modal-content {
-                width: 96%;
-                max-height: 94vh;
-                border-radius: 14px;
+                max-height: 95vh;
+                margin: 0.5rem;
             }
-            
-            .logo {
-                font-size: 1.35rem;
+
+            .stats {
+                padding: 0 1.5rem 1.5rem;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
-            
-            .sync-status {
-                display: none;
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .footer-content {
+                padding: 2rem 1.5rem;
+                gap: 2rem;
+            }
+
+            .lightbox-nav {
+                width: 45px;
+                height: 45px;
+            }
+
+            .lightbox-nav.prev {
+                left: 1rem;
+            }
+
+            .lightbox-nav.next {
+                right: 1rem;
             }
         }
-        
+
         @media (max-width: 480px) {
-            .header {
-                padding: 0.875rem;
-            }
-            
             .search-container {
-                padding: 0.875rem;
+                padding: 1.5rem;
             }
-            
+
             .notes-container {
-                padding: 0.875rem;
+                padding: 0 1.5rem 2rem;
             }
-            
-            .modal-header,
-            .modal-body,
-            .modal-footer {
-                padding: 1.25rem;
+
+            .header-actions {
+                gap: 0.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="logo">SnapNote</div>
-        <div class="header-actions">
-            <div class="sync-status" id="syncStatus">
-                <div class="sync-indicator"></div>
-                <span>Synced</span>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">📔</div>
+                    <div class="brand">
+                        <div class="brand-name">NoteVerse</div>
+                        <div class="brand-tagline">Digital Notebook</div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-icon" id="sortBtn" title="Sort Notes">
+                        <span>⇅</span>
+                    </button>
+                    <button class="btn" id="newNoteBtn">
+                        <span>✨</span>
+                        <span class="btn-text">New Note</span>
+                    </button>
+                </div>
             </div>
-            <button class="icon-btn" onclick="toggleView()" title="Change View" aria-label="Toggle view">
-                <span id="viewIcon">📊</span>
-            </button>
-            <button class="icon-btn primary" onclick="openNewNoteModal()" title="New Note" aria-label="Create new note">
-                ➕
-            </button>
-        </div>
-    </header>
+        </header>
 
-    <!-- Search -->
-    <div class="search-container">
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input 
-                type="text" 
-                class="search-input" 
-                id="searchInput" 
-                placeholder="Search notes by title, content, or tags..."
-                aria-label="Search notes"
-            >
-            <button class="clear-search" id="clearSearch" onclick="clearSearch()" aria-label="Clear search">✕</button>
+        <div class="search-container">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search notes...">
+            </div>
         </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Notes</div>
+                <div class="stat-value" id="totalNotes">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">With Images</div>
+                <div class="stat-value" id="notesWithImages">0</div>
+            </div>
+        </div>
+
+        <div class="notes-container">
+            <div class="notes-grid" id="notesGrid">
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h3>No notes yet</h3>
+                    <p>Create your first note to get started</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About NoteVerse</h3>
+                    <p>Your elegant digital notebook for capturing thoughts, memories, and moments. Built with modern web technologies to provide a seamless note-taking experience.</p>
+                    <div class="social-links">
+                        <div class="social-icon" title="Twitter">🐦</div>
+                        <div class="social-icon" title="GitHub">💻</div>
+                        <div class="social-icon" title="LinkedIn">💼</div>
+                        <div class="social-icon" title="Email">📧</div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <div class="footer-links">
+                        <a href="#">📝 Create Notes</a>
+                        <a href="#">📷 Add Images</a>
+                        <a href="#">🔍 Search & Filter</a>
+                        <a href="#">💾 Local Storage</a>
+                        <a href="#">📱 Mobile Friendly</a>
+                        <a href="#">🌙 Dark Mode</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <div class="footer-links">
+                        <a href="#">📖 Documentation</a>
+                        <a href="#">❓ Help & Support</a>
+                        <a href="#">🔒 Privacy Policy</a>
+                        <a href="#">📜 Terms of Service</a>
+                        <a href="#">🆕 What's New</a>
+                        <a href="#">💡 Feedback</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Get Started</h3>
+                    <p>Start organizing your thoughts and ideas today. All your notes are saved locally on your device for complete privacy.</p>
+                    <p style="margin-top: 1rem;"><strong>Keyboard Shortcuts:</strong></p>
+                    <p style="font-size: 0.85rem; line-height: 1.6;">
+                        Ctrl+N - New Note<br>
+                        ESC - Close Modal<br>
+                        ← → - Navigate Images
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 NoteVerse. Crafted with 💜 for note-takers everywhere. All rights reserved.</p>
+            </div>
+        </footer>
     </div>
 
-    <!-- Filter Tabs -->
-    <div class="filter-tabs" id="filterTabs" role="tablist">
-        <button class="filter-tab active" data-filter="all" role="tab">All Notes</button>
-        <button class="filter-tab" data-filter="recent" role="tab">Recent</button>
-    </div>
-
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-        <div class="stats-item">
-            <span>📝</span>
-            <strong id="noteCount">0</strong>
-            <span>Notes</span>
+    <!-- Image Lightbox -->
+    <div class="lightbox" id="imageLightbox">
+        <div class="lightbox-header">
+            <div class="lightbox-title" id="lightboxTitle"></div>
+            <button class="lightbox-close" id="closeLightbox">×</button>
         </div>
-        <div class="stats-item">
-            <span>🏷️</span>
-            <strong id="tagCount">0</strong>
-            <span>Tags</span>
+        <div class="lightbox-content">
+            <button class="lightbox-nav prev" id="prevImage">‹</button>
+            <div class="lightbox-image-container" id="lightboxImageContainer">
+                <img src="" alt="Full size image" class="lightbox-image" id="lightboxImage">
+            </div>
+            <button class="lightbox-nav next" id="nextImage">›</button>
         </div>
-    </div>
-
-    <!-- Notes Container -->
-    <div class="notes-container">
-        <div class="notes-grid" id="notesGrid" role="list">
-            <!-- Notes will be dynamically added here -->
-        </div>
-        <div class="empty-state" id="emptyState">
-            <div class="empty-icon">📝</div>
-            <h3>No Notes Yet</h3>
-            <p>Create your first note to get started</p>
+        <div class="lightbox-footer">
+            <div class="lightbox-counter" id="imageCounter"></div>
+            <div class="lightbox-controls">
+                <button class="lightbox-btn" id="zoomBtn">🔍 Zoom</button>
+                <button class="lightbox-btn" id="downloadBtn">⬇️ Download</button>
+            </div>
+            <div class="lightbox-thumbnails" id="lightboxThumbnails"></div>
         </div>
     </div>
 
     <!-- Note Modal -->
-    <div class="modal" id="noteModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+    <div class="modal" id="noteModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">New Note</h3>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close modal">✕</button>
+                <h2 class="modal-title" id="modalTitle">New Note</h2>
+                <button class="close-modal" id="closeModal">×</button>
             </div>
             <div class="modal-body">
-                <form id="noteForm" onsubmit="saveNote(event)">
+                <form id="noteForm">
                     <div class="form-group">
-                        <label class="form-label" for="noteTitle">Title</label>
-                        <input 
-                            type="text" 
-                            class="form-input" 
-                            id="noteTitle" 
-                            required 
-                            placeholder="Enter note title..."
-                            maxlength="100"
-                        >
+                        <label for="noteTitle">Title</label>
+                        <input type="text" id="noteTitle" placeholder="Enter note title..." required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="noteContent">Content</label>
-                        <textarea 
-                            class="form-input" 
-                            id="noteContent" 
-                            required 
-                            placeholder="Write your note here..."
-                        ></textarea>
+                        <label for="noteContent">Content</label>
+                        <textarea id="noteContent" placeholder="Write your note here..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="tagInput">Tags (Press Enter)</label>
-                        <div class="tag-input-container" id="tagContainer">
-                            <input 
-                                type="text" 
-                                class="tag-input" 
-                                id="tagInput" 
-                                placeholder="Add tags..."
-                                maxlength="20"
-                            >
+                        <label>Images (Optional)</label>
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div class="upload-icon">📷</div>
+                            <div class="upload-text">Click to upload or drag and drop images</div>
+                            <input type="file" id="imageInput" accept="image/*" multiple>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="btn btn-secondary" onclick="captureSnapshot()">
-                            📸 Capture Snapshot
-                        </button>
-                        <div id="snapshotPreview" class="snapshot-preview" style="display: none;"></div>
+                        <div class="image-preview-grid" id="imagePreviewGrid"></div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveNote(event)">Save Note</button>
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn" id="saveNoteBtn">Save Note</button>
             </div>
         </div>
     </div>
-
-    <!-- View Note Modal -->
-    <div class="modal" id="viewNoteModal" role="dialog" aria-labelledby="viewNoteTitle" aria-modal="true">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="viewNoteTitle"></h3>
-                <button class="modal-close" onclick="closeViewModal()" aria-label="Close modal">✕</button>
-            </div>
-            <div class="modal-body">
-                <div id="viewNoteSnapshot" style="display: none; margin-bottom: 1.5rem;">
-                    <img style="width: 100%; border-radius: 10px; border: 1px solid var(--border);" alt="Note snapshot">
-                </div>
-                <div id="viewNoteContent" style="line-height: 1.8; color: var(--text-primary); white-space: pre-wrap;"></div>
-                <div id="viewNoteTags" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem;"></div>
-                <div id="viewNoteDate" style="margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-secondary);"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" onclick="deleteCurrentNote()">Delete</button>
-                <button class="btn btn-secondary" onclick="editCurrentNote()">Edit</button>
-                <button class="btn btn-primary" onclick="downloadNoteImage()">Download</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hidden Canvas for Snapshot -->
-    <canvas id="snapshotCanvas"></canvas>
-
-    <!-- Toast -->
-    <div class="toast" id="toast" role="alert" aria-live="polite"></div>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvE82yFAhJbGTuj_l-wGvI8aBh-2B7O_0",
-            authDomain: "aesthetics-academy.firebaseapp.com",
-            projectId: "aesthetics-academy",
-            storageBucket: "aesthetics-academy.firebasestorage.app",
-            messagingSenderId: "229742131602",
-            appId: "1:229742131602:web:89ebc8ad85442e7d83294b",
-            measurementId: "G-NZTP202VJM"
-        };
-
-        // Initialize Firebase
-        let app, db;
-        let useFirebase = false;
-
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            useFirebase = true;
-            console.log('Firebase initialized successfully');
-            updateSyncStatus('Synced');
-        } catch (error) {
-            console.warn('Firebase not configured, using localStorage only:', error);
-            useFirebase = false;
-            updateSyncStatus('Local Only');
-        }
-
-        // Make Firebase available globally
-        window.firebaseDB = db;
-        window.useFirebase = useFirebase;
-        window.firestoreModules = { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy, onSnapshot };
-
-        // Load notes on startup
-        if (useFirebase) {
-            loadNotesFromFirebase();
-            setupRealtimeSync();
-        } else {
-            window.loadNotes();
-        }
-    </script>
 
     <script>
-        // State Management
+        // App State
         let notes = [];
         let currentNoteId = null;
-        let currentTags = [];
-        let currentSnapshot = null;
-        let allTags = new Set();
-        let currentFilter = 'all';
-        let currentView = 'grid';
-        let unsubscribeSnapshot = null;
+        let currentImages = [];
+        let sortOrder = 'newest'; // newest, oldest, alphabetical
+        
+        // Lightbox state
+        let lightboxImages = [];
+        let currentImageIndex = 0;
+        let isZoomed = false;
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!window.useFirebase) {
-                loadNotes();
-            }
-            setupEventListeners();
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotes();
             renderNotes();
             updateStats();
+            initEventListeners();
         });
 
-        function setupEventListeners() {
-            // Search
+        // Event Listeners
+        function initEventListeners() {
+            document.getElementById('newNoteBtn').addEventListener('click', openNewNoteModal);
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            document.getElementById('saveNoteBtn').addEventListener('click', saveNote);
             document.getElementById('searchInput').addEventListener('input', handleSearch);
-            
-            // Tag input
-            const tagInput = document.getElementById('tagInput');
-            if (tagInput) {
-                tagInput.addEventListener('keydown', handleTagInput);
-            }
-            
-            // Filter tabs
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilter = this.dataset.filter;
-                    renderNotes();
-                });
+            document.getElementById('sortBtn').addEventListener('click', toggleSort);
+
+            // Image upload
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const imageInput = document.getElementById('imageInput');
+
+            imageUploadArea.addEventListener('click', () => imageInput.click());
+            imageInput.addEventListener('change', handleImageSelect);
+
+            // Drag and drop
+            imageUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.add('dragover');
             });
 
-            // Close modals on outside click
-            document.getElementById('noteModal').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
+            imageUploadArea.addEventListener('dragleave', () => {
+                imageUploadArea.classList.remove('dragover');
             });
-            document.getElementById('viewNoteModal').addEventListener('click', function(e) {
-                if (e.target === this) closeViewModal();
+
+            imageUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleImageFiles(files);
+            });
+
+            // Close modal on outside click
+            document.getElementById('noteModal').addEventListener('click', (e) => {
+                if (e.target.id === 'noteModal') {
+                    closeModal();
+                }
             });
 
             // Keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'n') {
+                    e.preventDefault();
+                    openNewNoteModal();
+                }
                 if (e.key === 'Escape') {
                     closeModal();
-                    closeViewModal();
+                    closeLightbox();
+                }
+                
+                // Lightbox navigation
+                if (document.getElementById('imageLightbox').classList.contains('active')) {
+                    if (e.key === 'ArrowLeft') showPreviousImage();
+                    if (e.key === 'ArrowRight') showNextImage();
                 }
             });
-        }
 
-        // Firebase Functions
-        async function loadNotesFromFirebase() {
-            try {
-                updateSyncStatus('Loading...');
-                const { collection, getDocs, query, orderBy } = window.firestoreModules;
-                const q = query(collection(window.firebaseDB, 'notes'), orderBy('createdAt', 'desc'));
-                const querySnapshot = await getDocs(q);
-                
-                notes = [];
-                allTags.clear();
-                
-                querySnapshot.forEach((doc) => {
-                    const note = { firebaseId: doc.id, ...doc.data() };
-                    notes.push(note);
-                    if (note.tags) {
-                        note.tags.forEach(tag => allTags.add(tag));
-                    }
-                });
-                
-                updateFilterTabs();
-                renderNotes();
-                updateStats();
-                updateSyncStatus('Synced');
-            } catch (error) {
-                console.error('Error loading notes:', error);
-                showToast('Error loading notes', 'error');
-                updateSyncStatus('Error');
-            }
-        }
-
-        function setupRealtimeSync() {
-            const { collection, query, orderBy, onSnapshot } = window.firestoreModules;
-            const q = query(collection(window.firebaseDB, 'notes'), orderBy('createdAt', 'desc'));
+            // Lightbox controls
+            document.getElementById('closeLightbox').addEventListener('click', closeLightbox);
+            document.getElementById('prevImage').addEventListener('click', showPreviousImage);
+            document.getElementById('nextImage').addEventListener('click', showNextImage);
+            document.getElementById('zoomBtn').addEventListener('click', toggleZoom);
+            document.getElementById('downloadBtn').addEventListener('click', downloadCurrentImage);
             
-            unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added' || change.type === 'modified') {
-                        const note = { firebaseId: change.doc.id, ...change.doc.data() };
-                        const index = notes.findIndex(n => n.firebaseId === note.firebaseId);
-                        
-                        if (index !== -1) {
-                            notes[index] = note;
-                        } else {
-                            notes.push(note);
-                        }
-                        
-                        if (note.tags) {
-                            note.tags.forEach(tag => allTags.add(tag));
-                        }
-                    } else if (change.type === 'removed') {
-                        notes = notes.filter(n => n.firebaseId !== change.doc.id);
-                    }
-                });
-                
-                notes.sort((a, b) => b.createdAt - a.createdAt);
-                updateFilterTabs();
-                renderNotes();
-                updateStats();
+            // Click image to zoom
+            document.getElementById('lightboxImage').addEventListener('click', toggleZoom);
+            
+            // Close lightbox on background click
+            document.getElementById('imageLightbox').addEventListener('click', (e) => {
+                if (e.target.id === 'imageLightbox' || e.target.id === 'lightboxImageContainer') {
+                    closeLightbox();
+                }
             });
-        }
 
-        function updateSyncStatus(status) {
-            const syncStatus = document.getElementById('syncStatus');
-            if (syncStatus) {
-                syncStatus.querySelector('span').textContent = status;
+            // Touch gestures for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            const lightboxContent = document.getElementById('lightboxImageContainer');
+            lightboxContent.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            lightboxContent.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                if (touchEndX < touchStartX - 50) showNextImage();
+                if (touchEndX > touchStartX + 50) showPreviousImage();
             }
         }
 
-        // Storage Functions (localStorage fallback)
+        // Local Storage Functions
         function loadNotes() {
-            const stored = localStorage.getItem('snapnotes');
+            const stored = localStorage.getItem('notebook_notes');
             if (stored) {
                 notes = JSON.parse(stored);
-                notes.forEach(note => {
-                    if (note.tags) {
-                        note.tags.forEach(tag => allTags.add(tag));
-                    }
-                });
-                updateFilterTabs();
             }
         }
 
-        function saveNotesLocal() {
-            localStorage.setItem('snapnotes', JSON.stringify(notes));
+        function saveToStorage() {
+            localStorage.setItem('notebook_notes', JSON.stringify(notes));
         }
 
         // Modal Functions
         function openNewNoteModal() {
             currentNoteId = null;
-            currentTags = [];
-            currentSnapshot = null;
+            currentImages = [];
             document.getElementById('modalTitle').textContent = 'New Note';
             document.getElementById('noteForm').reset();
-            document.getElementById('tagContainer').innerHTML = '<input type="text" class="tag-input" id="tagInput" placeholder="Add tags..." maxlength="20">';
-            document.getElementById('snapshotPreview').style.display = 'none';
-            document.getElementById('noteModal').classList.add('show');
-            setupEventListeners();
+            document.getElementById('imagePreviewGrid').innerHTML = '';
+            document.getElementById('noteModal').classList.add('active');
             document.getElementById('noteTitle').focus();
         }
 
-        function closeModal() {
-            document.getElementById('noteModal').classList.remove('show');
-        }
-
-        function closeViewModal() {
-            document.getElementById('viewNoteModal').classList.remove('show');
-        }
-
-        // Tag Management
-        function handleTagInput(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const input = e.target;
-                const value = input.value.trim();
-                if (value && !currentTags.includes(value)) {
-                    currentTags.push(value);
-                    renderTagInput();
-                    input.value = '';
-                }
-            }
-        }
-
-        function removeTag(tag) {
-            currentTags = currentTags.filter(t => t !== tag);
-            renderTagInput();
-        }
-
-        function renderTagInput() {
-            const container = document.getElementById('tagContainer');
-            container.innerHTML = currentTags.map(tag => 
-                `<div class="tag-item">
-                    <span>${escapeHtml(tag)}</span>
-                    <button type="button" class="tag-remove" onclick="removeTag('${escapeHtml(tag)}')" aria-label="Remove tag">✕</button>
-                </div>`
-            ).join('') + '<input type="text" class="tag-input" id="tagInput" placeholder="Add tags..." maxlength="20">';
-            
-            const newInput = document.getElementById('tagInput');
-            if (newInput) {
-                newInput.addEventListener('keydown', handleTagInput);
-                newInput.focus();
-            }
-        }
-
-        // Snapshot Functions
-        function captureSnapshot() {
-            const title = document.getElementById('noteTitle').value;
-            const content = document.getElementById('noteContent').value;
-            
-            if (!title || !content) {
-                showToast('Title and content required', 'error');
-                return;
-            }
-
-            const canvas = document.getElementById('snapshotCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Set canvas size
-            canvas.width = 1200;
-            canvas.height = 800;
-            
-            // Background
-            ctx.fillStyle = '#151515';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Accent bar
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#00ff88');
-            gradient.addColorStop(1, '#00ddff');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 12, canvas.height);
-            
-            // Title
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 48px IBM Plex Sans, sans-serif';
-            ctx.fillText(title.substring(0, 40), 60, 100);
-            
-            // Line under title
-            ctx.fillStyle = '#2a2a2a';
-            ctx.fillRect(60, 130, canvas.width - 120, 3);
-            
-            // Content
-            ctx.fillStyle = '#a0a0a0';
-            ctx.font = '24px IBM Plex Sans, sans-serif';
-            
-            const words = content.split(' ');
-            let line = '';
-            let y = 200;
-            const maxWidth = canvas.width - 120;
-            const lineHeight = 42;
-            let lineCount = 0;
-            const maxLines = 12;
-            
-            for (let word of words) {
-                if (lineCount >= maxLines) {
-                    ctx.fillText('...', 60, y);
-                    break;
-                }
-                
-                const testLine = line + word + ' ';
-                const metrics = ctx.measureText(testLine);
-                
-                if (metrics.width > maxWidth && line !== '') {
-                    ctx.fillText(line, 60, y);
-                    line = word + ' ';
-                    y += lineHeight;
-                    lineCount++;
-                } else {
-                    line = testLine;
-                }
-            }
-            if (lineCount < maxLines && line) {
-                ctx.fillText(line, 60, y);
-            }
-            
-            // Tags
-            if (currentTags.length > 0) {
-                y = canvas.height - 100;
-                ctx.font = '20px IBM Plex Sans, sans-serif';
-                let x = 60;
-                
-                currentTags.slice(0, 5).forEach(tag => {
-                    const tagWidth = ctx.measureText(tag).width + 40;
-                    
-                    // Tag background
-                    ctx.fillStyle = '#1f1f1f';
-                    ctx.fillRect(x, y - 28, tagWidth, 40);
-                    
-                    // Tag border
-                    ctx.strokeStyle = '#2a2a2a';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(x, y - 28, tagWidth, 40);
-                    
-                    // Tag text
-                    ctx.fillStyle = '#00ff88';
-                    ctx.fillText(tag, x + 20, y);
-                    
-                    x += tagWidth + 15;
-                });
-            }
-            
-            // Branding
-            ctx.fillStyle = '#00ff88';
-            ctx.font = 'bold 24px Syne, sans-serif';
-            ctx.fillText('SnapNote', 60, canvas.height - 40);
-            
-            // Date
-            ctx.fillStyle = '#666666';
-            ctx.font = '18px IBM Plex Sans, sans-serif';
-            const dateStr = new Date().toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            ctx.fillText(dateStr, canvas.width - 60 - ctx.measureText(dateStr).width, canvas.height - 40);
-            
-            // Convert to image
-            currentSnapshot = canvas.toDataURL('image/png', 0.95);
-            
-            // Show preview
-            const preview = document.getElementById('snapshotPreview');
-            preview.innerHTML = `<img src="${currentSnapshot}" alt="Note snapshot preview">`;
-            preview.style.display = 'block';
-            
-            showToast('Snapshot captured successfully', 'success');
-        }
-
-        // Note CRUD
-        async function saveNote(e) {
-            if (e) e.preventDefault();
-            
-            const title = document.getElementById('noteTitle').value.trim();
-            const content = document.getElementById('noteContent').value.trim();
-            
-            if (!title || !content) {
-                showToast('Title and content required', 'error');
-                return;
-            }
-            
-            const noteData = {
-                title,
-                content,
-                tags: currentTags,
-                snapshot: currentSnapshot,
-                createdAt: currentNoteId ? 
-                    (window.useFirebase ? 
-                        notes.find(n => n.firebaseId === currentNoteId)?.createdAt : 
-                        notes.find(n => n.id === currentNoteId)?.createdAt) || Date.now() 
-                    : Date.now(),
-                updatedAt: Date.now()
-            };
-            
-            if (window.useFirebase) {
-                try {
-                    updateSyncStatus('Saving...');
-                    if (currentNoteId) {
-                        const { doc, updateDoc } = window.firestoreModules;
-                        await updateDoc(doc(window.firebaseDB, 'notes', currentNoteId), noteData);
-                        showToast('Note updated successfully', 'success');
-                    } else {
-                        const { collection, addDoc } = window.firestoreModules;
-                        await addDoc(collection(window.firebaseDB, 'notes'), noteData);
-                        showToast('Note saved successfully', 'success');
-                    }
-                    updateSyncStatus('Synced');
-                } catch (error) {
-                    console.error('Error saving note:', error);
-                    showToast('Error saving note', 'error');
-                    updateSyncStatus('Error');
-                    return;
-                }
-            } else {
-                const note = {
-                    id: currentNoteId || Date.now(),
-                    ...noteData
-                };
-                
-                if (currentNoteId) {
-                    const index = notes.findIndex(n => n.id === currentNoteId);
-                    notes[index] = note;
-                    showToast('Note updated', 'success');
-                } else {
-                    notes.unshift(note);
-                    showToast('Note saved', 'success');
-                }
-                
-                currentTags.forEach(tag => allTags.add(tag));
-                saveNotesLocal();
-                updateFilterTabs();
-                renderNotes();
-                updateStats();
-            }
-            
-            closeModal();
-        }
-
-        function viewNote(id) {
-            const note = window.useFirebase ? 
-                notes.find(n => n.firebaseId === id) : 
-                notes.find(n => n.id === id);
-            
+        function openEditNoteModal(noteId) {
+            const note = notes.find(n => n.id === noteId);
             if (!note) return;
-            
-            currentNoteId = window.useFirebase ? note.firebaseId : note.id;
-            document.getElementById('viewNoteTitle').textContent = note.title;
-            document.getElementById('viewNoteContent').textContent = note.content;
-            
-            if (note.snapshot) {
-                const snapshotDiv = document.getElementById('viewNoteSnapshot');
-                snapshotDiv.querySelector('img').src = note.snapshot;
-                snapshotDiv.style.display = 'block';
-            } else {
-                document.getElementById('viewNoteSnapshot').style.display = 'none';
-            }
-            
-            const tagsDiv = document.getElementById('viewNoteTags');
-            tagsDiv.innerHTML = (note.tags || []).map(tag => 
-                `<span class="tag">${escapeHtml(tag)}</span>`
-            ).join('');
-            
-            const dateStr = new Date(note.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.getElementById('viewNoteDate').textContent = 'Created: ' + dateStr;
-            
-            document.getElementById('viewNoteModal').classList.add('show');
-        }
 
-        function editCurrentNote() {
-            const note = window.useFirebase ? 
-                notes.find(n => n.firebaseId === currentNoteId) : 
-                notes.find(n => n.id === currentNoteId);
-            
-            if (!note) return;
-            
-            closeViewModal();
+            currentNoteId = noteId;
+            currentImages = note.images || [];
             
             document.getElementById('modalTitle').textContent = 'Edit Note';
             document.getElementById('noteTitle').value = note.title;
             document.getElementById('noteContent').value = note.content;
-            currentTags = [...(note.tags || [])];
-            currentSnapshot = note.snapshot;
             
-            renderTagInput();
-            
-            if (note.snapshot) {
-                const preview = document.getElementById('snapshotPreview');
-                preview.innerHTML = `<img src="${note.snapshot}" alt="Note snapshot preview">`;
-                preview.style.display = 'block';
-            }
-            
-            document.getElementById('noteModal').classList.add('show');
+            renderImagePreviews();
+            document.getElementById('noteModal').classList.add('active');
+            document.getElementById('noteTitle').focus();
         }
 
-        async function deleteCurrentNote() {
-            if (!confirm('Are you sure you want to delete this note?')) return;
-            
-            if (window.useFirebase) {
-                try {
-                    updateSyncStatus('Deleting...');
-                    const { doc, deleteDoc } = window.firestoreModules;
-                    await deleteDoc(doc(window.firebaseDB, 'notes', currentNoteId));
-                    showToast('Note deleted', 'success');
-                    updateSyncStatus('Synced');
-                } catch (error) {
-                    console.error('Error deleting note:', error);
-                    showToast('Error deleting note', 'error');
-                    updateSyncStatus('Error');
-                    return;
+        function closeModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            currentNoteId = null;
+            currentImages = [];
+        }
+
+        // Image Handling
+        function handleImageSelect(e) {
+            const files = e.target.files;
+            handleImageFiles(files);
+        }
+
+        function handleImageFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        currentImages.push(e.target.result);
+                        renderImagePreviews();
+                    };
+                    reader.readAsDataURL(file);
                 }
-            } else {
-                notes = notes.filter(n => n.id !== currentNoteId);
-                saveNotesLocal();
-                renderNotes();
-                updateStats();
-                showToast('Note deleted', 'success');
-            }
-            
-            closeViewModal();
-        }
-
-        function downloadNoteImage() {
-            const note = window.useFirebase ? 
-                notes.find(n => n.firebaseId === currentNoteId) : 
-                notes.find(n => n.id === currentNoteId);
-            
-            if (!note || !note.snapshot) {
-                showToast('No snapshot available', 'error');
-                return;
-            }
-            
-            const link = document.createElement('a');
-            link.download = `${note.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_snapshot.png`;
-            link.href = note.snapshot;
-            link.click();
-            
-            showToast('Download started', 'success');
-        }
-
-        // Render Functions
-        function renderNotes() {
-            let filteredNotes = [...notes];
-            
-            // Apply filter
-            if (currentFilter !== 'all') {
-                if (currentFilter === 'recent') {
-                    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-                    filteredNotes = filteredNotes.filter(n => n.createdAt > weekAgo);
-                } else {
-                    filteredNotes = filteredNotes.filter(n => 
-                        n.tags && n.tags.includes(currentFilter)
-                    );
-                }
-            }
-            
-            // Apply search
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            if (searchTerm) {
-                filteredNotes = filteredNotes.filter(n => 
-                    n.title.toLowerCase().includes(searchTerm) ||
-                    n.content.toLowerCase().includes(searchTerm) ||
-                    (n.tags && n.tags.some(t => t.toLowerCase().includes(searchTerm)))
-                );
-            }
-            
-            const grid = document.getElementById('notesGrid');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (filteredNotes.length === 0) {
-                grid.innerHTML = '';
-                emptyState.style.display = 'block';
-            } else {
-                emptyState.style.display = 'none';
-                const noteId = window.useFirebase ? 'firebaseId' : 'id';
-                grid.innerHTML = filteredNotes.map(note => `
-                    <div class="note-card" onclick="viewNote('${note[noteId]}')" role="listitem">
-                        ${note.snapshot ? `<img src="${note.snapshot}" class="note-thumbnail" alt="${escapeHtml(note.title)} thumbnail">` : ''}
-                        <div class="note-header">
-                            <div class="note-title">${escapeHtml(note.title)}</div>
-                        </div>
-                        <div class="note-content">${escapeHtml(note.content)}</div>
-                        <div class="note-footer">
-                            <div class="note-tags">
-                                ${(note.tags || []).slice(0, 3).map(tag => 
-                                    `<span class="tag">${escapeHtml(tag)}</span>`
-                                ).join('')}
-                            </div>
-                            <div class="note-date">${formatDate(note.createdAt)}</div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function updateFilterTabs() {
-            const tabs = document.getElementById('filterTabs');
-            const sortedTags = Array.from(allTags).sort();
-            const tagTabs = sortedTags.map(tag => 
-                `<button class="filter-tab" data-filter="${escapeHtml(tag)}" role="tab">${escapeHtml(tag)}</button>`
-            ).join('');
-            
-            tabs.innerHTML = `
-                <button class="filter-tab active" data-filter="all" role="tab">All Notes</button>
-                <button class="filter-tab" data-filter="recent" role="tab">Recent</button>
-                ${tagTabs}
-            `;
-            
-            tabs.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilter = this.dataset.filter;
-                    renderNotes();
-                });
             });
         }
 
-        function updateStats() {
-            document.getElementById('noteCount').textContent = notes.length;
-            document.getElementById('tagCount').textContent = allTags.size;
+        function renderImagePreviews() {
+            const grid = document.getElementById('imagePreviewGrid');
+            grid.innerHTML = currentImages.map((img, index) => `
+                <div class="image-preview-wrapper">
+                    <img src="${img}" alt="Preview" class="image-preview">
+                    <button class="remove-image" onclick="removeImage(${index})">×</button>
+                </div>
+            `).join('');
         }
 
-        // Search
-        function handleSearch(e) {
-            const value = e.target.value;
-            const clearBtn = document.getElementById('clearSearch');
-            
-            if (value) {
-                clearBtn.classList.add('show');
+        function removeImage(index) {
+            currentImages.splice(index, 1);
+            renderImagePreviews();
+        }
+
+        // Note CRUD Operations
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+
+            if (!title) {
+                alert('Please enter a title for your note');
+                return;
+            }
+
+            if (currentNoteId) {
+                // Edit existing note
+                const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                notes[noteIndex] = {
+                    ...notes[noteIndex],
+                    title,
+                    content,
+                    images: [...currentImages],
+                    updatedAt: new Date().toISOString()
+                };
             } else {
-                clearBtn.classList.remove('show');
+                // Create new note
+                const newNote = {
+                    id: Date.now().toString(),
+                    title,
+                    content,
+                    images: [...currentImages],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                notes.unshift(newNote);
+            }
+
+            saveToStorage();
+            renderNotes();
+            updateStats();
+            closeModal();
+        }
+
+        function deleteNote(noteId) {
+            if (confirm('Are you sure you want to delete this note?')) {
+                notes = notes.filter(n => n.id !== noteId);
+                saveToStorage();
+                renderNotes();
+                updateStats();
+            }
+        }
+
+        // Render Functions
+        function renderNotes(filteredNotes = null) {
+            const notesToRender = filteredNotes || notes;
+            const grid = document.getElementById('notesGrid');
+
+            if (notesToRender.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>${filteredNotes ? 'No notes found' : 'No notes yet'}</h3>
+                        <p>${filteredNotes ? 'Try a different search term' : 'Create your first note to get started'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = notesToRender.map(note => `
+                <div class="note-card">
+                    ${note.images && note.images.length > 0 ? `
+                        <div class="note-images">
+                            ${note.images.slice(0, 4).map((img, index) => `
+                                <div class="note-image-wrapper" onclick="event.stopPropagation(); openLightbox('${note.id}', ${index})">
+                                    <img src="${img}" alt="Note image" class="note-image">
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="note-content" onclick="openEditNoteModal('${note.id}')">
+                        <h3 class="note-title">${escapeHtml(note.title)}</h3>
+                        ${note.content ? `<p class="note-text">${escapeHtml(note.content)}</p>` : ''}
+                        <div class="note-meta">
+                            <span class="note-date">${formatDate(note.updatedAt || note.createdAt)}</span>
+                            <div class="note-actions" onclick="event.stopPropagation()">
+                                <button class="note-btn" onclick="openEditNoteModal('${note.id}')" title="Edit">
+                                    ✏️
+                                </button>
+                                <button class="note-btn delete" onclick="deleteNote('${note.id}')" title="Delete">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('totalNotes').textContent = notes.length;
+            const notesWithImages = notes.filter(n => n.images && n.images.length > 0).length;
+            document.getElementById('notesWithImages').textContent = notesWithImages;
+        }
+
+        // Search and Sort
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (!query) {
+                renderNotes();
+                return;
+            }
+
+            const filtered = notes.filter(note => 
+                note.title.toLowerCase().includes(query) ||
+                (note.content && note.content.toLowerCase().includes(query))
+            );
+
+            renderNotes(filtered);
+        }
+
+        function toggleSort() {
+            const orders = ['newest', 'oldest', 'alphabetical'];
+            const currentIndex = orders.indexOf(sortOrder);
+            sortOrder = orders[(currentIndex + 1) % orders.length];
+
+            switch(sortOrder) {
+                case 'newest':
+                    notes.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+                    break;
+                case 'oldest':
+                    notes.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    break;
+                case 'alphabetical':
+                    notes.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+            }
+
+            renderNotes();
+            
+            // Show toast notification
+            const sortLabels = {
+                newest: 'Sorted by Newest',
+                oldest: 'Sorted by Oldest',
+                alphabetical: 'Sorted Alphabetically'
+            };
+        }
+
+        // Lightbox Functions
+        function openLightbox(noteId, imageIndex = 0) {
+            const note = notes.find(n => n.id === noteId);
+            if (!note || !note.images || note.images.length === 0) return;
+
+            lightboxImages = note.images;
+            currentImageIndex = imageIndex;
+            
+            document.getElementById('lightboxTitle').textContent = note.title;
+            displayLightboxImage();
+            updateLightboxControls();
+            updateThumbnails();
+            
+            document.getElementById('imageLightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('imageLightbox').classList.remove('active');
+            document.body.style.overflow = '';
+            isZoomed = false;
+            document.getElementById('lightboxImage').classList.remove('zoomed');
+        }
+
+        function displayLightboxImage() {
+            const img = document.getElementById('lightboxImage');
+            img.src = lightboxImages[currentImageIndex];
+            img.classList.remove('zoomed');
+            isZoomed = false;
+        }
+
+        function showPreviousImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                displayLightboxImage();
+                updateLightboxControls();
+                updateThumbnails();
+            }
+        }
+
+        function showNextImage() {
+            if (currentImageIndex < lightboxImages.length - 1) {
+                currentImageIndex++;
+                displayLightboxImage();
+                updateLightboxControls();
+                updateThumbnails();
+            }
+        }
+
+        function updateLightboxControls() {
+            const prevBtn = document.getElementById('prevImage');
+            const nextBtn = document.getElementById('nextImage');
+            const counter = document.getElementById('imageCounter');
+            
+            prevBtn.disabled = currentImageIndex === 0;
+            nextBtn.disabled = currentImageIndex === lightboxImages.length - 1;
+            
+            if (lightboxImages.length > 1) {
+                counter.textContent = `${currentImageIndex + 1} / ${lightboxImages.length}`;
+            } else {
+                counter.textContent = '';
+            }
+        }
+
+        function updateThumbnails() {
+            const container = document.getElementById('lightboxThumbnails');
+            
+            if (lightboxImages.length <= 1) {
+                container.innerHTML = '';
+                return;
             }
             
-            renderNotes();
+            container.innerHTML = lightboxImages.map((img, index) => `
+                <img src="${img}" 
+                     class="lightbox-thumbnail ${index === currentImageIndex ? 'active' : ''}" 
+                     onclick="currentImageIndex = ${index}; displayLightboxImage(); updateLightboxControls(); updateThumbnails();"
+                     alt="Thumbnail ${index + 1}">
+            `).join('');
         }
 
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('clearSearch').classList.remove('show');
-            renderNotes();
+        function toggleZoom() {
+            const img = document.getElementById('lightboxImage');
+            isZoomed = !isZoomed;
+            
+            if (isZoomed) {
+                img.classList.add('zoomed');
+            } else {
+                img.classList.remove('zoomed');
+            }
         }
 
-        // View Toggle
-        function toggleView() {
-            currentView = currentView === 'grid' ? 'list' : 'grid';
-            document.getElementById('viewIcon').textContent = currentView === 'grid' ? '📊' : '📋';
-            // Could implement different view layouts here
+        function downloadCurrentImage() {
+            const img = lightboxImages[currentImageIndex];
+            const link = document.createElement('a');
+            link.href = img;
+            link.download = `image-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        // Utilities
-        function formatDate(timestamp) {
-            const date = new Date(timestamp);
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
             const now = new Date();
-            const diff = now - date;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} min ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
             
-            if (days === 0) return 'Today';
-            if (days === 1) return 'Yesterday';
-            if (days < 7) return `${days} days ago`;
-            if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-            
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
                 day: 'numeric',
                 year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
             });
         }
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast show ' + type;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
         function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
-        // Make functions globally available
-        window.loadNotes = loadNotes;
+        // PWA Support
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:application/javascript,');
+            });
+        }
     </script>
 </body>
 </html>
