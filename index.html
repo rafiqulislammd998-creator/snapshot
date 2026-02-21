@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>StudyNote - Smart Notebook for Students</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%236366f1' rx='20' width='100' height='100'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white'%3E📝%3C/text%3E%3C/svg%3E">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            updateDoc,
+            deleteDoc, 
+            doc, 
+            query, 
+            orderBy, 
+            serverTimestamp,
+            where,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfewhG9SPjp76SaJPXPYMS4U_QZvAVI6s",
+            authDomain: "notebook-7f368.firebaseapp.com",
+            projectId: "notebook-7f368",
+            storageBucket: "notebook-7f368.firebasestorage.app",
+            messagingSenderId: "15449288085",
+            appId: "1:15449288085:web:5da90f42e6635f0d1a1a9c",
+            measurementId: "G-V2D1DD0QKE"
+        };
+        
+        window.firebaseApp = initializeApp(firebaseConfig);
+        window.db = getFirestore(window.firebaseApp);
+        window.firestore = {
+            collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, where, getDoc
+        };
+        
+        window.dispatchEvent(new CustomEvent('firebase-ready'));
+    </script>
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">📝</span>
+                    <span class="logo-text">StudyNote</span>
+                </div>
+                <button id="closeSidebar" class="icon-btn mobile-only">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="all">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <span>All Notes</span>
+                    <span class="badge" id="allCount">0</span>
+                </button>
+                <button class="nav-item" data-view="favorites">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span>Favorites</span>
+                    <span class="badge" id="favCount">0</span>
+                </button>
+                <button class="nav-item" data-view="recent">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>Recent</span>
+                </button>
+                <button class="nav-item" data-view="trash">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    <span>Trash</span>
+                    <span class="badge" id="trashCount">0</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Categories</h3>
+                <div id="categoryList" class="category-list">
+                    <!-- Categories will be dynamically added -->
+                </div>
+                <button id="addCategoryBtn" class="add-category-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Add Category
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="themeToggle" class="icon-btn" title="Toggle Theme">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <button id="exportBtn" class="icon-btn" title="Export Data">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+                <button id="importBtn" class="icon-btn" title="Import Data">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </button>
+                <input type="file" id="importFile" accept=".json" hidden>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <button id="menuToggle" class="icon-btn mobile-only">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                
+                <div class="search-bar">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search notes...">
+                    <button id="clearSearch" class="clear-search hidden">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="header-actions">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="alpha">Alphabetical</option>
+                        <option value="updated">Last Updated</option>
+                    </select>
+                    <button id="newNoteBtn" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        <span class="desktop-only">New Note</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- View Title -->
+                <div class="view-header">
+                    <h1 id="viewTitle">All Notes</h1>
+                    <p id="viewSubtitle" class="subtitle">Organize your study materials</p>
+                </div>
+
+                <!-- Tags Filter -->
+                <div id="tagsFilter" class="tags-filter hidden">
+                    <span class="filter-label">Filter by tag:</span>
+                    <div id="activeTags" class="active-tags"></div>
+                    <button id="clearTags" class="clear-tags">Clear</button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="loading-state hidden">
+                    <div class="spinner"></div>
+                    <p>Loading notes...</p>
+                </div>
+
+                <!-- Notes Grid -->
+                <div id="notesGrid" class="notes-grid">
+                    <!-- Notes will be dynamically added -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h2>No notes yet</h2>
+                    <p>Create your first note to get started with your studies</p>
+                    <button id="emptyNewNoteBtn" class="btn btn-primary">Create Note</button>
+                </div>
+
+                <!-- Search Empty State -->
+                <div id="searchEmptyState" class="empty-state hidden">
+                    <div class="empty-icon">🔍</div>
+                    <h2>No results found</h2>
+                    <p>Try adjusting your search terms</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Note Editor Modal -->
+        <div id="editorModal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content editor-modal">
+                <div class="modal-header">
+                    <input type="text" id="noteTitle" placeholder="Note Title" class="note-title-input">
+                    <div class="modal-actions">
+                        <button id="favoriteBtn" class="icon-btn" title="Add to favorites">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </button>
+                        <button id="closeEditor" class="icon-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="editor-toolbar">
+                    <select id="noteCategory" class="category-select">
+                        <option value="">Select Category</option>
+                    </select>
+                    <div class="toolbar-divider"></div>
+                    <button id="addImageBtn" class="toolbar-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        Add Image
+                    </button>
+                    <input type="file" id="imageInput" accept="image/*" multiple hidden>
+                    <button id="addTagBtn" class="toolbar-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                            <line x1="7" y1="7" x2="7.01" y2="7"/>
+                        </svg>
+                        Add Tag
+                    </button>
+                </div>
+
+                <!-- Upload Progress -->
+                <div id="uploadProgress" class="upload-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <span class="progress-text">Uploading images...</span>
+                </div>
+
+                <div id="tagsContainer" class="tags-container"></div>
+
+                <div id="imagePreviewContainer" class="image-preview-container"></div>
+
+                <textarea id="noteContent" placeholder="Start writing your note..." class="note-content"></textarea>
+
+                <div class="modal-footer">
+                    <button id="deleteNoteBtn" class="btn btn-danger hidden">Delete</button>
+                    <div class="footer-spacer"></div>
+                    <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                    <button id="saveNoteBtn" class="btn btn-primary">
+                        <span class="btn-text">Save Note</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tag Input Modal -->
+        <div id="tagModal" class="modal modal-small">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <h3>Add Tag</h3>
+                <input type="text" id="tagInput" placeholder="Enter tag name...">
+                <div class="modal-actions-row">
+                    <button id="cancelTagBtn" class="btn btn-secondary">Cancel</button>
+                    <button id="saveTagBtn" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Modal -->
+        <div id="categoryModal" class="modal modal-small">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <h3>Add Category</h3>
+                <input type="text" id="categoryInput" placeholder="Category name...">
+                <div class="color-picker">
+                    <span>Choose color:</span>
+                    <div class="color-options">
+                        <button class="color-option active" data-color="#6366f1" style="background: #6366f1"></button>
+                        <button class="color-option" data-color="#ec4899" style="background: #ec4899"></button>
+                        <button class="color-option" data-color="#10b981" style="background: #10b981"></button>
+                        <button class="color-option" data-color="#f59e0b" style="background: #f59e0b"></button>
+                        <button class="color-option" data-color="#ef4444" style="background: #ef4444"></button>
+                        <button class="color-option" data-color="#8b5cf6" style="background: #8b5cf6"></button>
+                        <button class="color-option" data-color="#06b6d4" style="background: #06b6d4"></button>
+                        <button class="color-option" data-color="#84cc16" style="background: #84cc16"></button>
+                    </div>
+                </div>
+                <div class="modal-actions-row">
+                    <button id="cancelCategoryBtn" class="btn btn-secondary">Cancel</button>
+                    <button id="saveCategoryBtn" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Preview Modal -->
+        <div id="imagePreviewModal" class="modal modal-full">
+            <div class="modal-overlay"></div>
+            <div class="modal-content image-modal-content">
+                <button id="closeImagePreview" class="icon-btn close-image-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <img id="previewImage" src="" alt="Preview">
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+
+        <!-- Confirm Dialog -->
+        <div id="confirmDialog" class="modal modal-small">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <h3 id="confirmTitle">Confirm</h3>
+                <p id="confirmMessage">Are you sure?</p>
+                <div class="modal-actions-row">
+                    <button id="cancelConfirmBtn" class="btn btn-secondary">Cancel</button>
+                    <button id="confirmBtn" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
