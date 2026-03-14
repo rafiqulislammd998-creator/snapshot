@@ -5,45 +5,65 @@
 
 const blogPosts = [
     {
-        id: 1,
-        title: "The Future of AI: How Machine Learning is Transforming Industries",
-        excerpt: "Explore how artificial intelligence and machine learning are revolutionizing healthcare, finance, manufacturing, and more. Discover the latest trends and what they mean for the future.",
-        content: `
-            <p>Artificial Intelligence has moved from science fiction to everyday reality. From virtual assistants in our phones to recommendation algorithms on streaming platforms, AI is everywhere. But this is just the beginning.</p>
-            
-            <h2>The Current State of AI</h2>
-            <p>Today's AI systems are capable of tasks that seemed impossible just a decade ago. Machine learning models can now generate human-like text, create artwork, diagnose diseases, and even write code. These capabilities are transforming industries at an unprecedented pace.</p>
-            
-            <h2>Healthcare Revolution</h2>
-            <p>In healthcare, AI is being used to analyze medical images with accuracy that rivals or exceeds human experts. Drug discovery processes that once took years are being compressed into months. Personalized treatment plans based on genetic profiles are becoming reality.</p>
-            
-            <h2>Financial Services Transformation</h2>
-            <p>The financial sector has embraced AI for fraud detection, algorithmic trading, and risk assessment. Banks and insurance companies use machine learning to process millions of transactions in real-time, identifying suspicious patterns instantly.</p>
-            
-            <h2>Manufacturing and Automation</h2>
-            <p>Smart factories powered by AI can predict equipment failures before they happen, optimize production schedules in real-time, and maintain quality control with superhuman precision.</p>
-            
-            <h2>Looking Ahead</h2>
-            <p>As we look to the future, the integration of AI into our daily lives will only deepen. The key challenges will be ensuring ethical use, maintaining privacy, and managing the societal impacts of widespread automation.</p>
-            
-            <blockquote>"The development of full artificial intelligence could spell the end of the human race... It would take off on its own, and re-design itself at an ever-increasing rate." — Stephen Hawking</blockquote>
-            
-            <p>The future of AI is both exciting and challenging. As these technologies continue to evolve, our responsibility is to guide their development in ways that benefit humanity as a whole.</p>
-        `,
-        category: "technology",
-        image: "https://res.cloudinary.com/dgeukkdc9/image/upload/v1773484528/images_1_lewc3o.jpg",
-        author: {
-            name: "Sarah Chen",
-            avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
-            role: "Tech Editor"
-        },
-        date: "2024-03-10",
-        readTime: "8 min read",
-        views: "12.5K",
-        likes: 856,
-        featured: true,
-        tags: ["AI", "Machine Learning", "Technology", "Future"]
+    id: 1,
+    title: "PPL স্প্লিট: নতুনদের জন্য সহজ ও কার্যকর জিম রুটিন 💪",
+    excerpt: `PPL কি?
+PPL মানে Push, Pull, Legs। এটা একটি জিম স্প্লিট যেখানে তোমার সপ্তাহের ওয়ার্কআউটকে তিন ভাগে ভাগ করা হয়:
+Push (ঠেলা) – বুক, কাঁধ, এবং ট্রাইসেপসের জন্য
+Pull (টানা) – পিঠ এবং বাইসেপসের জন্য
+Legs (পা) – পায়ের মাংসপেশি এবং হ্যামস্ট্রিং
+এই স্প্লিট দিয়ে প্রতিটি মাংসপেশি ঠিক সময়ে বিশ্রাম পায়, তাই বৃদ্ধি (growth) এবং শক্তি (strength) দুটোই ভালো হয়।`,
+    content: `
+        <p>PPL মানে Push, Pull, Legs। এটি একটি সহজ এবং কার্যকর জিম স্প্লিট। নতুনরা এই রুটিন দিয়ে প্রতিটি মাসল গ্রুপ ঠিক সময়ে কাজ করতে পারে এবং পর্যাপ্ত বিশ্রাম পায়।</p>
+        
+        <h2>PPL কিভাবে কাজ করে?</h2>
+        <p>তোমার সপ্তাহের ওয়ার্কআউটকে তিন ভাগে ভাগ করা হয়:</p>
+        <ul>
+            <li><strong>Push (ঠেলা)</strong> – বুক, কাঁধ, এবং ট্রাইসেপস</li>
+            <li><strong>Pull (টানা)</strong> – পিঠ এবং বাইসেপস</li>
+            <li><strong>Legs (পা)</strong> – পায়ের মাসল এবং হ্যামস্ট্রিং</li>
+        </ul>
+        <p>এভাবে প্রতিটি মাসল গ্রুপ পর্যাপ্ত বিশ্রাম পায় এবং শক্তি ও মাসল বৃদ্ধি হয়।</p>
+        
+        <h2>নতুনদের জন্য কেন ভালো?</h2>
+        <ul>
+            <li><strong>সহজ ও সরল:</strong> সপ্তাহে মাত্র তিন ধরনের দিন।</li>
+            <li><strong>পূর্ণ দেহের কভারেজ:</strong> সব মাসল নিয়মিত কাজ করে।</li>
+            <li><strong>ফাস্ট রেজাল্ট:</strong> সঠিকভাবে করলে শক্তি এবং মাসল দ্রুত বৃদ্ধি পায়।</li>
+            <li><strong>ফ্লেক্সিবল:</strong> সপ্তাহে 3 থেকে 6 দিন ওয়ার্কআউট করা যায়।</li>
+        </ul>
+        
+        <h2>সাধারণ সপ্তাহের রুটিন</h2>
+        <p>উদাহরণস্বরূপ:</p>
+        <ul>
+            <li>সোমবার – Push</li>
+            <li>মঙ্গলবার – Pull</li>
+            <li>বুধবার – Legs</li>
+            <li>বৃহস্পতিবার – Push</li>
+            <li>শুক্রবার – Pull</li>
+            <li>শনিবার – Legs</li>
+            <li>রবিবার – বিশ্রাম</li>
+        </ul>
+        
+        <p>হালকা ওজন দিয়ে শুরু করো এবং সঠিক ফর্মে ফোকাস করো। এটি নতুনদের জন্য একটি আদর্শ স্প্লিট।</p>
+        
+        <h2>উপসংহার</h2>
+        <p>PPL স্প্লিট নতুনদের জন্য সহজ, কার্যকর এবং ফ্লেক্সিবল। এটি তোমার মাসল বাড়াতে সাহায্য করবে এবং ওয়ার্কআউটের অভিজ্ঞতাও মজার করবে।</p>
+    `,
+    category: "fitness",
+    image: "https://res.cloudinary.com/dgeukkdc9/image/upload/v1773484528/images_1_lewc3o.jpg",
+    author: {
+        name: "Redwan",
+        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+        role: "Fitness Blogger"
     },
+    date: "2026-03-14",
+    readTime: "5 min read",
+    views: "5.2K",
+    likes: 420,
+    featured: true,
+    tags: ["PPL", "Gym", "Workout", "Beginner"]
+},
     {
         id: 7,
         title: "Remote Work Revolution: Building Productive Home Offices",
