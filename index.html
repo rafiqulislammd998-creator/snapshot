@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Blog - Stories That Inspire</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <span class="logo-icon"><i class="fas fa-feather-alt"></i></span>
+                <span class="logo-text">Aesthetic_Archive</span>
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#featured" class="nav-link">Featured</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#blog" class="nav-link">Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">Contact</a>
+                </li>
+            </ul>
+            
+            <!-- Right Side Controls -->
+            <div class="nav-controls">
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <!-- Hamburger Menu -->
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul class="mobile-nav-menu">
+            <li><a href="#home" class="mobile-nav-link">Home</a></li>
+            <li><a href="#featured" class="mobile-nav-link">Featured</a></li>
+            <li><a href="#blog" class="mobile-nav-link">Blog</a></li>
+            <li><a href="#about" class="mobile-nav-link">About</a></li>
+            <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-background">
+                <div class="hero-gradient"></div>
+                <div class="hero-pattern"></div>
+            </div>
+            <div class="hero-content">
+                <span class="hero-subtitle">Welcome to Aesthetic Archive </span>
+                <h1 class="hero-title">
+                    Discover Stories That
+                    <span class="gradient-text">Inspire & Transform</span>
+                </h1>
+                <p class="hero-description">
+                    Explore a curated collection of articles on technology, design, lifestyle, and creativity. 
+                    Dive into insights that spark imagination and fuel your passion for learning.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#blog" class="btn btn-primary">
+                        <span>Explore Articles</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#about" class="btn btn-secondary">
+                        <span>Learn More</span>
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">150+</span>
+                        <span class="stat-label">Articles</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">Readers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">25+</span>
+                        <span class="stat-label">Writers</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-scroll">
+                <div class="scroll-indicator">
+                    <span>Scroll to explore</span>
+                    <div class="scroll-arrow">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Featured Article Section -->
+        <section class="featured-section" id="featured">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Editor's Pick</span>
+                    <h2 class="section-title">Featured Article</h2>
+                </div>
+                <div class="featured-article" id="featuredArticle">
+                    <!-- Featured article will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Blog Section -->
+        <section class="blog-section" id="blog">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Latest Stories</span>
+                    <h2 class="section-title">Explore Our Blog</h2>
+                    <p class="section-description">
+                        Discover insightful articles across various topics crafted by our talented writers.
+                    </p>
+                </div>
+                
+                <!-- Search and Filter -->
+                <div class="blog-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            id="searchInput" 
+                            placeholder="Search articles..."
+                            autocomplete="off"
+                        >
+                        <button class="search-clear" id="searchClear">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="category-filters" id="categoryFilters">
+                        <button class="filter-btn active" data-category="all">
+                            <i class="fas fa-th-large"></i>
+                            <span>All</span>
+                        </button>
+                        <button class="filter-btn" data-category="technology">
+                            <i class="fas fa-laptop-code"></i>
+                            <span>Technology</span>
+                        </button>
+                        <button class="filter-btn" data-category="design">
+                            <i class="fas fa-palette"></i>
+                            <span>Design</span>
+                        </button>
+                        <button class="filter-btn" data-category="lifestyle">
+                            <i class="fas fa-heart"></i>
+                            <span>Lifestyle</span>
+                        </button>
+                        <button class="filter-btn" data-category="creativity">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Creativity</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Blog Grid -->
+                <div class="blog-grid" id="blogGrid">
+                    <!-- Blog posts will be loaded dynamically -->
+                </div>
+                
+                <!-- No Results Message -->
+                <div class="no-results" id="noResults">
+                    <div class="no-results-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>No articles found</h3>
+                    <p>Try adjusting your search or filter criteria</p>
+                </div>
+                
+                <!-- Load More Button -->
+                <div class="load-more-container">
+                    <button class="btn btn-outline" id="loadMoreBtn">
+                        <span>Load More Articles</span>
+                        <i class="fas fa-spinner loading-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section class="about-section" id="about">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-image">
+                        <div class="about-image-wrapper">
+                            <img 
+                                src="https://res.cloudinary.com/dgeukkdc9/image/upload/f_auto,q_auto,w_600,h_700,c_fill/v1771670499/mnihle2bzovbxldlirxa.png" 
+                                alt="Our team collaborating"
+                                loading="lazy"
+                            >
+                            <div class="about-image-decoration"></div>
+                        </div>
+                    </div>
+                    <div class="about-content">
+                        <span class="section-tag">About Me😉</span>
+                        <h2 class="section-title">We're a Community of Storytellers</h2>
+                        <p class="about-text">
+                            Lumina was founded with a simple mission: to create a space where ideas can flourish 
+                            and knowledge can be shared freely. Our diverse team of writers, designers, and 
+                            thinkers are passionate about delivering content that matters.
+                        </p>
+                        <p class="about-text">
+                            From cutting-edge technology insights to creative design inspiration, from lifestyle 
+                            tips to deep dives into creativity — we cover it all with authenticity and expertise.
+                        </p>
+                        <div class="about-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span>Quality Content</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span>Expert Writers</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span>Fresh Perspectives</span>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-primary">
+                            <span>Get in Touch</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="contact-section" id="contact">
+            <div class="container">
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <span class="section-tag">Contact Us</span>
+                        <h2 class="section-title">Let's Start a Conversation</h2>
+                        <p class="contact-description">
+                            Have a question, suggestion, or want to contribute? We'd love to hear from you. 
+                            Fill out the form and we'll get back to you as soon as possible.
+                        </p>
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <span class="contact-label">Email</span>
+                                    <span class="contact-value">hello@lumina.blog</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <span class="contact-label">Location</span>
+                                    <span class="contact-value">San Francisco, CA</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <span class="contact-label">Response Time</span>
+                                    <span class="contact-value">Within 24 hours</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-form-wrapper">
+                        <form class="contact-form" id="contactForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">Your Name</label>
+                                    <input 
+                                        type="text" 
+                                        id="name" 
+                                        name="name" 
+                                        class="form-input" 
+                                        placeholder="John Doe"
+                                        required
+                                    >
+                                    <i class="fas fa-user form-icon"></i>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        id="email" 
+                                        name="email" 
+                                        class="form-input" 
+                                        placeholder="john@example.com"
+                                        required
+                                    >
+                                    <i class="fas fa-envelope form-icon"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="subject" class="form-label">Subject</label>
+                                <input 
+                                    type="text" 
+                                    id="subject" 
+                                    name="subject" 
+                                    class="form-input" 
+                                    placeholder="How can we help?"
+                                    required
+                                >
+                                <i class="fas fa-tag form-icon"></i>
+                            </div>
+                            <div class="form-group">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea 
+                                    id="message" 
+                                    name="message" 
+                                    class="form-textarea" 
+                                    placeholder="Tell us what's on your mind..."
+                                    rows="5"
+                                    required
+                                ></textarea>
+                                <i class="fas fa-comment form-icon"></i>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full">
+                                <span>Send Message</span>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="footer-logo">
+                        <span class="logo-icon"><i class="fas fa-feather-alt"></i></span>
+                        <span class="logo-text">Lumina</span>
+                    </a>
+                    <p class="footer-description">
+                        A modern blog platform sharing stories that inspire, educate, and transform. 
+                        Join our community of curious minds.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-title">Quick Links</h4>
+                    <ul class="footer-menu">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#featured">Featured</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-title">Categories</h4>
+                    <ul class="footer-menu">
+                        <li><a href="#" data-category="technology">Technology</a></li>
+                        <li><a href="#" data-category="design">Design</a></li>
+                        <li><a href="#" data-category="lifestyle">Lifestyle</a></li>
+                        <li><a href="#" data-category="creativity">Creativity</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-newsletter">
+                    <h4 class="footer-title">Stay Updated</h4>
+                    <p class="newsletter-description">
+                        Subscribe to our newsletter for the latest articles and updates.
+                    </p>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <div class="newsletter-input-group">
+                            <input 
+                                type="email" 
+                                class="newsletter-input" 
+                                placeholder="Enter your email"
+                                required
+                            >
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="copyright">
+                    &copy; 2024 Lumina Blog. All rights reserved.
+                </p>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- Article Modal -->
+    <div class="article-modal" id="articleModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-container">
+            <button class="modal-close" id="modalClose" aria-label="Close article">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-content" id="modalContent">
+                <!-- Article content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast-message" id="toastMessage">Message sent successfully!</div>
+    </div>
+    
+   <!-- JavaScript Files - ORDER MATTERS! -->
+    <script src="blog.js"></script>      <!-- Load blog data FIRST -->
+    <script src="script.js"></script>    <!-- Then load main script -->
+</body>
+</html>
