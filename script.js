@@ -55,6 +55,36 @@ const elements = {
     // Toast
     toast: document.getElementById('toast'),
     toastMessage: document.getElementById('toastMessage')
+
+    // Manager & Password
+    , managerBtn: document.getElementById('managerBtn')
+    , passwordModal: document.getElementById('passwordModal')
+    , passwordModalOverlay: document.getElementById('passwordModalOverlay')
+    , passwordModalClose: document.getElementById('passwordModalClose')
+    , passwordForm: document.getElementById('passwordForm')
+    , passwordInput: document.getElementById('passwordInput')
+    , passwordError: document.getElementById('passwordError')
+    , managerModal: document.getElementById('managerModal')
+    , managerModalOverlay: document.getElementById('managerModalOverlay')
+    , managerClose: document.getElementById('managerClose')
+    , managerLogout: document.getElementById('managerLogout')
+    , managerNavItems: document.querySelectorAll('.manager-nav-item')
+    , uploadTab: document.getElementById('uploadTab')
+    , manageTab: document.getElementById('manageTab')
+    , uploadForm: document.getElementById('uploadForm')
+    , blogTitleInput: document.getElementById('blogTitle')
+    , blogCategoryInput: document.getElementById('blogCategory')
+    , blogExcerptInput: document.getElementById('blogExcerpt')
+    , blogContentInput: document.getElementById('blogContent')
+    // Input for the blog image URL (no file upload)
+    , blogImageUrlInput: document.getElementById('blogImageUrl')
+    // Additional fields for author avatar and publish date
+    , avatarUrlInput: document.getElementById('avatarUrl')
+    , blogDateInput: document.getElementById('blogDate')
+    , uploadSubmitBtn: document.getElementById('uploadSubmitBtn')
+    , manageSearch: document.getElementById('manageSearch')
+    , manageFilter: document.getElementById('manageFilter')
+    , blogsList: document.getElementById('blogsList')
 };
 
 // ============================================
@@ -66,7 +96,9 @@ const state = {
     searchQuery: '',
     displayedPosts: 6,
     postsPerLoad: 3,
-    isDarkMode: false
+    isDarkMode: false,
+    // Manager authentication flag
+    managerLoggedIn: false
 };
 
 // ============================================
@@ -80,6 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     initLazyLoading();
     initScrollAnimations();
+
+    // Fetch dynamic blogs from Firestore after initial render
+    if (typeof fetchBlogs === 'function') {
+        fetchBlogs();
+    }
 });
 
 // ============================================
@@ -87,11 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================
 
 function initTheme() {
-    // Check for saved theme preference or system preference
+    // Force dark mode by default. If the user has previously selected light mode
+    // we honour that preference, otherwise default to dark.
     const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+    if (savedTheme === 'light') {
+        enableLightMode();
+    } else {
         enableDarkMode();
     }
 }
@@ -344,6 +382,8 @@ function openArticle(postId) {
     const post = blogPosts.find(p => p.id === postId);
     if (!post) return;
     
+    // Ensure tags is an array to avoid errors if undefined
+    const tags = post.tags || [];
     elements.modalContent.innerHTML = `
         <div class="article-header">
             <img src="${post.image}" alt="${post.title}" class="article-image">
@@ -370,7 +410,7 @@ function openArticle(postId) {
         </div>
         <div class="article-footer">
             <div class="article-tags">
-                ${post.tags.map(tag => `<span class="article-tag">#${tag}</span>`).join('')}
+                ${tags.map(tag => `<span class="article-tag">#${tag}</span>`).join('')}
             </div>
             <div class="article-actions">
                 <button class="article-action-btn" onclick="shareArticle(${post.id})" title="Share">
@@ -604,13 +644,441 @@ function initEventListeners() {
             }
         });
     });
+
+    // =============================
+    // MANAGER PANEL EVENTS
+    // =============================
+    // Open password modal
+    if (elements.managerBtn) {
+        elements.managerBtn.addEventListener('click', openPasswordModal);
+    }
+
+    // Password modal interactions
+    if (elements.passwordModalOverlay) {
+        elements.passwordModalOverlay.addEventListener('click', closePasswordModal);
+    }
+    if (elements.passwordModalClose) {
+        elements.passwordModalClose.addEventListener('click', closePasswordModal);
+    }
+    if (elements.passwordForm) {
+        elements.passwordForm.addEventListener('submit', handlePasswordSubmit);
+    }
+
+    // Manager modal interactions
+    if (elements.managerModalOverlay) {
+        elements.managerModalOverlay.addEventListener('click', closeManagerModal);
+    }
+    if (elements.managerClose) {
+        elements.managerClose.addEventListener('click', closeManagerModal);
+    }
+    if (elements.managerLogout) {
+        elements.managerLogout.addEventListener('click', handleManagerLogout);
+    }
+    // Tab switching
+    elements.managerNavItems.forEach(item => {
+        item.addEventListener('click', () => switchManagerTab(item.dataset.tab));
+    });
+
+    // Image upload area
+    if (elements.imageUploadArea) {
+        elements.imageUploadArea.addEventListener('click', () => {
+            elements.blogImageInput.click();
+        });
+        elements.imageUploadArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            elements.imageUploadArea.classList.add('dragover');
+        });
+        elements.imageUploadArea.addEventListener('dragleave', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            elements.imageUploadArea.classList.remove('dragover');
+        });
+        elements.imageUploadArea.addEventListener('drop', handleDropImage);
+    }
+    if (elements.blogImageInput) {
+        elements.blogImageInput.addEventListener('change', handleImageSelection);
+    }
+    if (elements.removeImageBtn) {
+        elements.removeImageBtn.addEventListener('click', removeSelectedImage);
+    }
+    if (elements.uploadForm) {
+        elements.uploadForm.addEventListener('submit', handleUploadFormSubmit);
+    }
+    // Manage search & filter
+    if (elements.manageSearch) {
+        elements.manageSearch.addEventListener('input', updateManageList);
+    }
+    if (elements.manageFilter) {
+        elements.manageFilter.addEventListener('change', updateManageList);
+    }
+    // Delete blog item via delegation
+    if (elements.blogsList) {
+        elements.blogsList.addEventListener('click', handleBlogsListClick);
+    }
+}
+
+// ============================================
+// MANAGER PANEL & FIRESTORE FUNCTIONS
+// ============================================
+
+// Store dynamically loaded posts from Firestore
+let dynamicPosts = [];
+// In the link-based upload flow we no longer store an image file.
+// Keeping a variable here for potential future use, but not used in current implementation.
+let selectedImageFile = null;
+
+/**
+ * Show the password modal to prompt for manager access
+ */
+function openPasswordModal() {
+    elements.passwordInput.value = '';
+    if (elements.passwordError) elements.passwordError.style.display = 'none';
+    elements.passwordModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Hide the password modal
+ */
+function closePasswordModal() {
+    elements.passwordModal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+/**
+ * Handle password form submission. Validates the passcode (4466).
+ */
+function handlePasswordSubmit(e) {
+    e.preventDefault();
+    const pass = elements.passwordInput.value.trim();
+    if (pass === '4466') {
+        state.managerLoggedIn = true;
+        closePasswordModal();
+        openManagerModal();
+    } else {
+        if (elements.passwordError) {
+            elements.passwordError.style.display = 'block';
+        }
+    }
+}
+
+/**
+ * Show the manager modal and fetch posts
+ */
+function openManagerModal() {
+    elements.managerModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    // Reset upload form inputs when opening panel
+    if (elements.uploadForm) {
+        elements.uploadForm.reset();
+    }
+    // Clear any previously entered image URL when opening the panel
+    if (elements.blogImageUrlInput) {
+        elements.blogImageUrlInput.value = '';
+    }
+    // Clear avatar URL and reset date to today
+    if (elements.avatarUrlInput) {
+        elements.avatarUrlInput.value = '';
+    }
+    if (elements.blogDateInput) {
+        // Set date to current date in YYYY-MM-DD format
+        elements.blogDateInput.value = new Date().toISOString().split('T')[0];
+    }
+    // Default to upload tab on open
+    switchManagerTab('upload');
+    // Fetch blogs from Firestore
+    fetchBlogs();
+}
+
+/**
+ * Hide the manager modal
+ */
+function closeManagerModal() {
+    elements.managerModal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+/**
+ * Logout manager and close the panel
+ */
+function handleManagerLogout() {
+    state.managerLoggedIn = false;
+    closeManagerModal();
+}
+
+/**
+ * Switch between upload and manage tabs within the manager panel
+ * @param {string} tab - 'upload' or 'manage'
+ */
+function switchManagerTab(tab) {
+    elements.managerNavItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.tab === tab);
+    });
+    elements.uploadTab.classList.toggle('active', tab === 'upload');
+    elements.manageTab.classList.toggle('active', tab === 'manage');
+    if (tab === 'manage') {
+        updateManageList();
+    }
+}
+
+/**
+ * Handle image selection from file input
+ */
+function handleImageSelection(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    selectedImageFile = file;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        elements.previewImg.src = evt.target.result;
+        elements.imagePreview.style.display = 'flex';
+        elements.imagePlaceholder.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+/**
+ * Handle image drop (drag-and-drop) onto upload area
+ */
+function handleDropImage(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) {
+        // Set the file input's files so that handleImageSelection processes it
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        elements.blogImageInput.files = dataTransfer.files;
+        handleImageSelection({ target: { files: [file] } });
+    }
+    elements.imageUploadArea.classList.remove('dragover');
+}
+
+/**
+ * Remove the currently selected image
+ */
+function removeSelectedImage() {
+    selectedImageFile = null;
+    if (elements.blogImageInput) {
+        elements.blogImageInput.value = '';
+    }
+    elements.imagePreview.style.display = 'none';
+    elements.imagePlaceholder.style.display = 'flex';
+}
+
+/**
+ * Handle the upload form submission. Uploads image to Firebase Storage and post data to Firestore.
+ */
+async function handleUploadFormSubmit(e) {
+    e.preventDefault();
+    if (!state.managerLoggedIn) return;
+    const title = elements.blogTitleInput.value.trim();
+    const category = elements.blogCategoryInput.value;
+    const excerpt = elements.blogExcerptInput.value.trim();
+    const content = elements.blogContentInput.value.trim();
+    if (!title || !category || !excerpt || !content) {
+        showToast('Please fill out all fields.');
+        return;
+    }
+    // Get the image URL from the input instead of a file
+    const imageUrl = elements.blogImageUrlInput ? elements.blogImageUrlInput.value.trim() : '';
+    if (!imageUrl) {
+        showToast('Please provide a valid image URL.');
+        return;
+    }
+
+    // Get optional avatar and date values
+    const avatarUrl = elements.avatarUrlInput && elements.avatarUrlInput.value.trim();
+    const dateValue = elements.blogDateInput && elements.blogDateInput.value;
+    // Show loading indicator on button
+    const btn = elements.uploadSubmitBtn;
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    btn.disabled = true;
+    try {
+        const { addDoc, collection, serverTimestamp } = window.firebaseModules;
+        // Store the post directly with the provided image URL.  
+        // The imagePath is left empty since we are not uploading to Storage.
+        await addDoc(collection(window.db, 'blogs'), {
+            title,
+            category,
+            excerpt,
+            content,
+            image: imageUrl,
+            imagePath: '',
+            // Store the publish date provided by the user or default to today
+            date: dateValue || new Date().toISOString().split('T')[0],
+            createdAt: serverTimestamp(),
+            readTime: '5 min read',
+            views: '0',
+            likes: 0,
+            author: {
+                name: 'Admin',
+                // Use the avatar URL entered by the manager or a default avatar image
+                avatar: avatarUrl || 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=60',
+                role: 'Admin'
+            }
+        });
+        // Reset form and states
+        elements.uploadForm.reset();
+        // Clear image, avatar and date fields explicitly (reset does not repopulate date)
+        if (elements.blogImageUrlInput) {
+            elements.blogImageUrlInput.value = '';
+        }
+        if (elements.avatarUrlInput) {
+            elements.avatarUrlInput.value = '';
+        }
+        if (elements.blogDateInput) {
+            elements.blogDateInput.value = new Date().toISOString().split('T')[0];
+        }
+        showToast('Blog uploaded successfully!');
+        // Re-fetch posts to include the new one
+        await fetchBlogs();
+        // Switch to manage tab to show new post
+        switchManagerTab('manage');
+    } catch (err) {
+        console.error(err);
+        showToast('Error uploading blog. Please try again.');
+    } finally {
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+    }
+}
+
+/**
+ * Fetch blog entries from Firestore and merge with existing posts
+ */
+async function fetchBlogs() {
+    if (!window.firebaseModules || !window.db) return;
+    const { collection, getDocs, query, orderBy } = window.firebaseModules;
+    try {
+        const q = query(collection(window.db, 'blogs'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        // Build dynamic posts array
+        const newDynamic = [];
+        querySnapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            let createdDate;
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                createdDate = data.createdAt.toDate();
+            } else {
+                createdDate = new Date();
+            }
+            // Use the explicit date saved in the document if available, otherwise derive from createdAt
+            const postDate = data.date || createdDate.toISOString().split('T')[0];
+            newDynamic.push({
+                id: createdDate.getTime(),
+                docId: docSnap.id,
+                title: data.title,
+                category: data.category,
+                excerpt: data.excerpt,
+                content: data.content,
+                image: data.image,
+                imagePath: data.imagePath || '',
+                date: postDate,
+                readTime: data.readTime || '5 min read',
+                views: data.views || '0',
+                likes: data.likes || 0,
+                // Provide an empty array for tags if none were saved to avoid errors in openArticle
+                tags: data.tags || [],
+                author: data.author || { name: 'Admin', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=60', role: 'Admin' }
+            });
+        });
+        dynamicPosts = newDynamic;
+        // Remove previous dynamic posts from blogPosts
+        for (let i = blogPosts.length - 1; i >= 0; i--) {
+            if (blogPosts[i].docId) {
+                blogPosts.splice(i, 1);
+            }
+        }
+        // Append new dynamic posts
+        blogPosts.push(...dynamicPosts);
+        // Re-render articles for all users
+        renderFeaturedArticle();
+        renderBlogPosts();
+        // Update manage list if panel open and manage tab active
+        if (elements.managerModal.classList.contains('active') && elements.manageTab.classList.contains('active')) {
+            updateManageList();
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+/**
+ * Build the manage list UI based on dynamic posts and filters
+ */
+function updateManageList() {
+    if (!elements.blogsList) return;
+    let filtered = dynamicPosts.slice();
+    const search = elements.manageSearch && elements.manageSearch.value.trim().toLowerCase();
+    const filterCategory = elements.manageFilter && elements.manageFilter.value;
+    if (search) {
+        filtered = filtered.filter(p => p.title.toLowerCase().includes(search) || p.excerpt.toLowerCase().includes(search));
+    }
+    if (filterCategory && filterCategory !== 'all') {
+        filtered = filtered.filter(p => p.category === filterCategory);
+    }
+    const html = filtered.map(post => {
+        return `
+            <div class="blog-item" data-doc-id="${post.docId}">
+                <div class="blog-item-info">
+                    <img src="${post.image}" alt="${post.title}" class="blog-item-thumb">
+                    <div>
+                        <div class="blog-item-title">${post.title}</div>
+                        <div class="blog-item-meta">${post.category} · ${formatDate(post.date)}</div>
+                    </div>
+                </div>
+                <button class="delete-blog" data-doc-id="${post.docId}" data-image-path="${post.imagePath}" aria-label="Delete blog">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+    elements.blogsList.innerHTML = html;
+}
+
+/**
+ * Handle click events inside the manage blogs list (for deletion)
+ */
+async function handleBlogsListClick(e) {
+    const deleteBtn = e.target.closest('.delete-blog');
+    if (!deleteBtn) return;
+    const docId = deleteBtn.dataset.docId;
+    const imagePath = deleteBtn.dataset.imagePath;
+    if (!docId) return;
+    const confirmed = confirm('Are you sure you want to delete this blog?');
+    if (!confirmed) return;
+    try {
+        const { deleteDoc, doc, deleteObject, ref } = window.firebaseModules;
+        await deleteDoc(doc(window.db, 'blogs', docId));
+        if (imagePath) {
+            await deleteObject(ref(window.storage, imagePath));
+        }
+        showToast('Blog deleted successfully!');
+        // Remove from blogPosts array
+        for (let i = blogPosts.length - 1; i >= 0; i--) {
+            if (blogPosts[i].docId === docId) {
+                blogPosts.splice(i, 1);
+                break;
+            }
+        }
+        // Re-fetch dynamic posts to refresh lists
+        await fetchBlogs();
+    } catch (err) {
+        console.error(err);
+        showToast('Error deleting blog. Please try again.');
+    }
 }
 
 // ============================================
 // SERVICE WORKER (for offline support)
 // ============================================
 
-if ('serviceWorker' in navigator) {
+// Register the service worker only when the site is served over HTTP/HTTPS.  
+// Service workers cannot be registered from the `file:` protocol, which is used when opening the HTML file directly in a browser.
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => {
         // Simple service worker for offline caching
         const swCode = `

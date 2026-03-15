@@ -54,6 +54,12 @@
                     <i class="fas fa-moon"></i>
                 </button>
                 
+                <!-- Manager Panel Button -->
+                <button class="manager-btn" id="managerBtn" aria-label="Manager Panel">
+                    <i class="fas fa-cog"></i>
+                    <span>Manager</span>
+                </button>
+
                 <!-- Hamburger Menu -->
                 <button class="hamburger" id="hamburger" aria-label="Toggle menu">
                     <span class="bar"></span>
@@ -486,7 +492,161 @@
         </div>
         <div class="toast-message" id="toastMessage">Message sent successfully!</div>
     </div>
-    
+
+    <!-- Password Modal -->
+    <div class="password-modal" id="passwordModal">
+        <div class="modal-overlay" id="passwordModalOverlay"></div>
+        <div class="password-modal-container">
+            <button class="modal-close" id="passwordModalClose" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="password-modal-content">
+                <div class="password-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="password-title">Manager Access</h2>
+                <p class="password-description">Enter the manager password to access the admin panel</p>
+                <form class="password-form" id="passwordForm">
+                    <div class="password-input-group">
+                        <i class="fas fa-key password-input-icon"></i>
+                        <input type="password" class="password-input" id="passwordInput" placeholder="Enter password" required maxlength="4">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <span>Access Panel</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+                <p class="password-error" id="passwordError">Incorrect password. Please try again.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manager Panel Modal -->
+    <div class="manager-modal" id="managerModal">
+        <div class="modal-overlay" id="managerModalOverlay"></div>
+        <div class="manager-modal-container">
+            <div class="manager-sidebar">
+                <div class="manager-sidebar-header">
+                    <i class="fas fa-cogs"></i>
+                    <span>Manager Panel</span>
+                </div>
+                <nav class="manager-nav">
+                    <button class="manager-nav-item active" data-tab="upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Upload Blog</span>
+                    </button>
+                    <button class="manager-nav-item" data-tab="manage">
+                        <i class="fas fa-edit"></i>
+                        <span>Manage Blogs</span>
+                    </button>
+                </nav>
+                <button class="manager-logout" id="managerLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+            <div class="manager-content">
+                <button class="manager-close" id="managerClose" aria-label="Close panel">
+                    <i class="fas fa-times"></i>
+                </button>
+                <!-- Upload Tab -->
+                <div class="manager-tab active" id="uploadTab">
+                    <h2 class="manager-title">Upload New Blog</h2>
+                    <form class="upload-form" id="uploadForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Blog Title</label>
+                                <input type="text" class="form-input" id="blogTitle" placeholder="Enter blog title" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select class="form-input" id="blogCategory" required>
+                                    <option value="">Select category</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="design">Design</option>
+                                    <option value="lifestyle">Lifestyle</option>
+                                    <option value="creativity">Creativity</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Additional fields for avatar and publish date -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Author Avatar URL</label>
+                                <input type="url" class="form-input" id="avatarUrl" placeholder="Enter author avatar URL">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Publish Date</label>
+                                <input type="date" class="form-input" id="blogDate">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Excerpt</label>
+                            <textarea class="form-textarea" id="blogExcerpt" placeholder="Brief description of the blog..." rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Content</label>
+                            <textarea class="form-textarea" id="blogContent" placeholder="Write your blog content here..." rows="8" required></textarea>
+                        </div>
+                        <!--
+                            Replace drag & drop file input with a simple URL input.  
+                            The new field lets administrators paste an image URL directly instead of uploading files
+                            to Firebase Storage.  
+                        -->
+                        <div class="form-group">
+                            <label class="form-label">Featured Image URL</label>
+                            <input type="url" class="form-input" id="blogImageUrl" placeholder="Enter image URL" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full" id="uploadSubmitBtn">
+                            <span>Publish Blog</span>
+                            <i class="fas fa-upload"></i>
+                        </button>
+                    </form>
+                </div>
+                <!-- Manage Tab -->
+                <div class="manager-tab" id="manageTab">
+                    <h2 class="manager-title">Manage Blogs</h2>
+                    <div class="manage-controls">
+                        <input type="text" class="form-input" id="manageSearch" placeholder="Search blogs...">
+                        <select class="form-input" id="manageFilter">
+                            <option value="all">All Categories</option>
+                            <option value="technology">Technology</option>
+                            <option value="design">Design</option>
+                            <option value="lifestyle">Lifestyle</option>
+                            <option value="creativity">Creativity</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="blogs-list" id="blogsList">
+                        <!-- Blog entries will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Initialization -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKyB3UMzdDxnf9LdHtKPSbJB27G6jHXVM",
+            authDomain: "aarchive-a3264.firebaseapp.com",
+            projectId: "aarchive-a3264",
+            storageBucket: "aarchive-a3264.firebasestorage.app",
+            messagingSenderId: "287655342980",
+            appId: "1:287655342980:web:cecf5a970c0fca723be3d1",
+            measurementId: "G-S2NNJET9LW"
+        };
+        const firebaseApp = initializeApp(firebaseConfig);
+        window.db = getFirestore(firebaseApp);
+        window.storage = getStorage(firebaseApp);
+        window.firebaseModules = { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, serverTimestamp, ref, uploadBytes, getDownloadURL, deleteObject };
+    </script>
+
    <!-- JavaScript Files - ORDER MATTERS! -->
     <script src="blog.js"></script>      <!-- Load blog data FIRST -->
     <script src="script.js"></script>    <!-- Then load main script -->
