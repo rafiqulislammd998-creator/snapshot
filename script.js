@@ -81,6 +81,8 @@ const elements = {
     // Additional fields for author avatar and publish date
     , avatarUrlInput: document.getElementById('avatarUrl')
     , blogDateInput: document.getElementById('blogDate')
+    , avatarFileInput: document.getElementById('avatarFile')
+    , blogImageFileInput: document.getElementById('blogImageFile')
     , uploadSubmitBtn: document.getElementById('uploadSubmitBtn')
     , manageSearch: document.getElementById('manageSearch')
     , manageFilter: document.getElementById('manageFilter')
@@ -104,6 +106,91 @@ const state = {
 // ============================================
 // INITIALIZATION
 // ============================================
+
+const STORAGE_BUCKET = window.SUPABASE_STORAGE_BUCKET || 'site-media';
+
+function svgDataUri(svg) {
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function getDefaultPostImage() {
+    return svgDataUri(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+            <defs>
+                <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#6366f1"/>
+                    <stop offset="100%" stop-color="#ec4899"/>
+                </linearGradient>
+            </defs>
+            <rect width="1200" height="675" fill="#0f172a"/>
+            <rect x="36" y="36" width="1128" height="603" rx="28" fill="url(#g)" opacity="0.22"/>
+            <text x="50%" y="46%" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="700">Aesthetic Archive</text>
+            <text x="50%" y="56%" text-anchor="middle" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="24">No featured image provided</text>
+        </svg>
+    `);
+}
+
+function getDefaultAvatar(name = 'Admin') {
+    const initial = (name || 'A').trim().charAt(0).toUpperCase() || 'A';
+    return svgDataUri(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+            <defs>
+                <linearGradient id="avatarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#6366f1"/>
+                    <stop offset="100%" stop-color="#06b6d4"/>
+                </linearGradient>
+            </defs>
+            <rect width="200" height="200" rx="100" fill="url(#avatarGradient)"/>
+            <text x="50%" y="56%" text-anchor="middle" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="84" font-weight="700">${initial}</text>
+        </svg>
+    `);
+}
+
+function slugify(value) {
+    return String(value || 'file')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 60) || 'file';
+}
+
+async function uploadFileToSupabase(file, folder) {
+    if (!file) return { publicUrl: '', path: '' };
+    if (!window.supabaseClient) {
+        throw new Error('Supabase client is not initialized.');
+    }
+
+    const extension = (file.name.split('.').pop() || 'bin').toLowerCase();
+    const filePath = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${slugify(file.name.replace(/\.[^.]+$/, ''))}.${extension}`;
+
+    const { error } = await window.supabaseClient.storage
+        .from(STORAGE_BUCKET)
+        .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: file.type || undefined
+        });
+
+    if (error) {
+        if (String(error.message || '').toLowerCase().includes('bucket')) {
+            throw new Error(`Supabase bucket "${STORAGE_BUCKET}" was not found. Create it in Storage and make it public before uploading.`);
+        }
+        throw error;
+    }
+
+    const { data } = window.supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
+    return { publicUrl: data.publicUrl, path: filePath };
+}
+
+async function removeSupabaseFile(path) {
+    if (!path || !window.supabaseClient) return;
+    try {
+        await window.supabaseClient.storage.from(STORAGE_BUCKET).remove([path]);
+    } catch (error) {
+        console.error('Supabase delete error:', error);
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
@@ -679,29 +766,6 @@ function initEventListeners() {
         item.addEventListener('click', () => switchManagerTab(item.dataset.tab));
     });
 
-    // Image upload area
-    if (elements.imageUploadArea) {
-        elements.imageUploadArea.addEventListener('click', () => {
-            elements.blogImageInput.click();
-        });
-        elements.imageUploadArea.addEventListener('dragover', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            elements.imageUploadArea.classList.add('dragover');
-        });
-        elements.imageUploadArea.addEventListener('dragleave', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            elements.imageUploadArea.classList.remove('dragover');
-        });
-        elements.imageUploadArea.addEventListener('drop', handleDropImage);
-    }
-    if (elements.blogImageInput) {
-        elements.blogImageInput.addEventListener('change', handleImageSelection);
-    }
-    if (elements.removeImageBtn) {
-        elements.removeImageBtn.addEventListener('click', removeSelectedImage);
-    }
     if (elements.uploadForm) {
         elements.uploadForm.addEventListener('submit', handleUploadFormSubmit);
     }
@@ -724,9 +788,6 @@ function initEventListeners() {
 
 // Store dynamically loaded posts from Firestore
 let dynamicPosts = [];
-// In the link-based upload flow we no longer store an image file.
-// Keeping a variable here for potential future use, but not used in current implementation.
-let selectedImageFile = null;
 
 /**
  * Show the password modal to prompt for manager access
@@ -823,123 +884,86 @@ function switchManagerTab(tab) {
 }
 
 /**
- * Handle image selection from file input
- */
-function handleImageSelection(e) {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    selectedImageFile = file;
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-        elements.previewImg.src = evt.target.result;
-        elements.imagePreview.style.display = 'flex';
-        elements.imagePlaceholder.style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-}
-
-/**
- * Handle image drop (drag-and-drop) onto upload area
- */
-function handleDropImage(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const file = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (file) {
-        // Set the file input's files so that handleImageSelection processes it
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        elements.blogImageInput.files = dataTransfer.files;
-        handleImageSelection({ target: { files: [file] } });
-    }
-    elements.imageUploadArea.classList.remove('dragover');
-}
-
-/**
- * Remove the currently selected image
- */
-function removeSelectedImage() {
-    selectedImageFile = null;
-    if (elements.blogImageInput) {
-        elements.blogImageInput.value = '';
-    }
-    elements.imagePreview.style.display = 'none';
-    elements.imagePlaceholder.style.display = 'flex';
-}
-
-/**
  * Handle the upload form submission. Uploads image to Firebase Storage and post data to Firestore.
  */
 async function handleUploadFormSubmit(e) {
     e.preventDefault();
     if (!state.managerLoggedIn) return;
+
     const title = elements.blogTitleInput.value.trim();
     const category = elements.blogCategoryInput.value;
     const excerpt = elements.blogExcerptInput.value.trim();
     const content = elements.blogContentInput.value.trim();
+
     if (!title || !category || !excerpt || !content) {
-        showToast('Please fill out all fields.');
-        return;
-    }
-    // Get the image URL from the input instead of a file
-    const imageUrl = elements.blogImageUrlInput ? elements.blogImageUrlInput.value.trim() : '';
-    if (!imageUrl) {
-        showToast('Please provide a valid image URL.');
+        showToast('Please fill out all required fields.');
         return;
     }
 
-    // Get optional avatar and date values
-    const avatarUrl = elements.avatarUrlInput && elements.avatarUrlInput.value.trim();
+    const imageUrlInput = elements.blogImageUrlInput ? elements.blogImageUrlInput.value.trim() : '';
+    const avatarUrlInput = elements.avatarUrlInput ? elements.avatarUrlInput.value.trim() : '';
+    const imageFile = elements.blogImageFileInput && elements.blogImageFileInput.files ? elements.blogImageFileInput.files[0] : null;
+    const avatarFile = elements.avatarFileInput && elements.avatarFileInput.files ? elements.avatarFileInput.files[0] : null;
     const dateValue = elements.blogDateInput && elements.blogDateInput.value;
-    // Show loading indicator on button
+
     const btn = elements.uploadSubmitBtn;
     const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
     btn.disabled = true;
+
+    let uploadedImagePath = '';
+    let uploadedAvatarPath = '';
+
     try {
+        let finalImage = imageUrlInput || getDefaultPostImage();
+        let finalAvatar = avatarUrlInput || getDefaultAvatar('Admin');
+
+        if (imageFile) {
+            const uploadedImage = await uploadFileToSupabase(imageFile, 'posts');
+            finalImage = uploadedImage.publicUrl || finalImage;
+            uploadedImagePath = uploadedImage.path || '';
+        }
+
+        if (avatarFile) {
+            const uploadedAvatar = await uploadFileToSupabase(avatarFile, 'avatars');
+            finalAvatar = uploadedAvatar.publicUrl || finalAvatar;
+            uploadedAvatarPath = uploadedAvatar.path || '';
+        }
+
         const { addDoc, collection, serverTimestamp } = window.firebaseModules;
-        // Store the post directly with the provided image URL.  
-        // The imagePath is left empty since we are not uploading to Storage.
         await addDoc(collection(window.db, 'blogs'), {
             title,
             category,
             excerpt,
             content,
-            image: imageUrl,
+            image: finalImage,
             imagePath: '',
-            // Store the publish date provided by the user or default to today
+            supabaseImagePath: uploadedImagePath,
             date: dateValue || new Date().toISOString().split('T')[0],
             createdAt: serverTimestamp(),
             readTime: '5 min read',
             views: '0',
             likes: 0,
+            tags: [],
             author: {
                 name: 'Admin',
-                // Use the avatar URL entered by the manager or a default avatar image
-                avatar: avatarUrl || 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=60',
+                avatar: finalAvatar,
                 role: 'Admin'
-            }
+            },
+            supabaseAvatarPath: uploadedAvatarPath
         });
-        // Reset form and states
+
         elements.uploadForm.reset();
-        // Clear image, avatar and date fields explicitly (reset does not repopulate date)
-        if (elements.blogImageUrlInput) {
-            elements.blogImageUrlInput.value = '';
-        }
-        if (elements.avatarUrlInput) {
-            elements.avatarUrlInput.value = '';
-        }
         if (elements.blogDateInput) {
             elements.blogDateInput.value = new Date().toISOString().split('T')[0];
         }
-        showToast('Blog uploaded successfully!');
-        // Re-fetch posts to include the new one
+
+        showToast('Blog published successfully.');
         await fetchBlogs();
-        // Switch to manage tab to show new post
         switchManagerTab('manage');
     } catch (err) {
         console.error(err);
-        showToast('Error uploading blog. Please try again.');
+        showToast(err && err.message ? err.message : 'Upload failed. Check Supabase bucket and policies.');
     } finally {
         btn.innerHTML = originalHTML;
         btn.disabled = false;
@@ -974,15 +998,17 @@ async function fetchBlogs() {
                 category: data.category,
                 excerpt: data.excerpt,
                 content: data.content,
-                image: data.image,
+                image: data.image || getDefaultPostImage(),
                 imagePath: data.imagePath || '',
+                supabaseImagePath: data.supabaseImagePath || '',
                 date: postDate,
                 readTime: data.readTime || '5 min read',
                 views: data.views || '0',
                 likes: data.likes || 0,
                 // Provide an empty array for tags if none were saved to avoid errors in openArticle
                 tags: data.tags || [],
-                author: data.author || { name: 'Admin', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=60', role: 'Admin' }
+                supabaseAvatarPath: data.supabaseAvatarPath || '',
+                author: data.author || { name: 'Admin', avatar: getDefaultAvatar('Admin'), role: 'Admin' }
             });
         });
         dynamicPosts = newDynamic;
@@ -1030,7 +1056,7 @@ function updateManageList() {
                         <div class="blog-item-meta">${post.category} · ${formatDate(post.date)}</div>
                     </div>
                 </div>
-                <button class="delete-blog" data-doc-id="${post.docId}" data-image-path="${post.imagePath}" aria-label="Delete blog">
+                <button class="delete-blog" data-doc-id="${post.docId}" data-image-path="${post.imagePath}" data-supabase-image-path="${post.supabaseImagePath || ''}" data-supabase-avatar-path="${post.supabaseAvatarPath || ''}" aria-label="Delete blog">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -1047,6 +1073,8 @@ async function handleBlogsListClick(e) {
     if (!deleteBtn) return;
     const docId = deleteBtn.dataset.docId;
     const imagePath = deleteBtn.dataset.imagePath;
+    const supabaseImagePath = deleteBtn.dataset.supabaseImagePath;
+    const supabaseAvatarPath = deleteBtn.dataset.supabaseAvatarPath;
     if (!docId) return;
     const confirmed = confirm('Are you sure you want to delete this blog?');
     if (!confirmed) return;
@@ -1056,6 +1084,8 @@ async function handleBlogsListClick(e) {
         if (imagePath) {
             await deleteObject(ref(window.storage, imagePath));
         }
+        await removeSupabaseFile(supabaseImagePath);
+        await removeSupabaseFile(supabaseAvatarPath);
         showToast('Blog deleted successfully!');
         // Remove from blogPosts array
         for (let i = blogPosts.length - 1; i >= 0; i--) {

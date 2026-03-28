@@ -155,14 +155,6 @@
         right: 0.5rem;
     }
 }
-    .manager-modal-container {
-        flex-direction: column;
-        width: 100%;
-        max-width: none;
-        max-height: none;
-        margin: 1rem;
-    }
-}
 
 /* ============================================
    MANAGER PANEL & PASSWORD MODAL
@@ -324,7 +316,7 @@
     inset: 0;
     z-index: var(--z-modal);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     opacity: 0;
     visibility: hidden;
@@ -1695,6 +1687,22 @@ input, textarea {
     font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 0.5rem;
+}
+
+.field-optional {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.form-helper {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.file-input {
+    padding-left: 1rem;
 }
 
 .form-input,

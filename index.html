@@ -574,13 +574,18 @@
                         <!-- Additional fields for avatar and publish date -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Author Avatar URL</label>
-                                <input type="url" class="form-input" id="avatarUrl" placeholder="Enter author avatar URL">
+                                <label class="form-label">Author Avatar URL <span class="field-optional">(optional)</span></label>
+                                <input type="url" class="form-input" id="avatarUrl" placeholder="Paste an avatar URL if you do not want to upload a file">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Publish Date</label>
                                 <input type="date" class="form-input" id="blogDate">
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Author Avatar Upload <span class="field-optional">(optional)</span></label>
+                            <input type="file" class="form-input file-input" id="avatarFile" accept="image/*">
+                            <p class="form-helper">Uploads the avatar to Supabase Storage. If both a file and a URL are provided, the uploaded file wins.</p>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Excerpt</label>
@@ -590,14 +595,14 @@
                             <label class="form-label">Content</label>
                             <textarea class="form-textarea" id="blogContent" placeholder="Write your blog content here..." rows="8" required></textarea>
                         </div>
-                        <!--
-                            Replace drag & drop file input with a simple URL input.  
-                            The new field lets administrators paste an image URL directly instead of uploading files
-                            to Firebase Storage.  
-                        -->
                         <div class="form-group">
-                            <label class="form-label">Featured Image URL</label>
-                            <input type="url" class="form-input" id="blogImageUrl" placeholder="Enter image URL" required>
+                            <label class="form-label">Featured Image URL <span class="field-optional">(optional)</span></label>
+                            <input type="url" class="form-input" id="blogImageUrl" placeholder="Paste an image URL if you do not want to upload a file">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Featured Image Upload <span class="field-optional">(optional)</span></label>
+                            <input type="file" class="form-input file-input" id="blogImageFile" accept="image/*">
+                            <p class="form-helper">Uploads the cover image to Supabase Storage. If both a file and a URL are provided, the uploaded file wins.</p>
                         </div>
                         <button type="submit" class="btn btn-primary btn-full" id="uploadSubmitBtn">
                             <span>Publish Blog</span>
@@ -645,6 +650,18 @@
         window.db = getFirestore(firebaseApp);
         window.storage = getStorage(firebaseApp);
         window.firebaseModules = { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, serverTimestamp, ref, uploadBytes, getDownloadURL, deleteObject };
+    </script>
+
+
+    <!-- Supabase Initialization -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.SUPABASE_URL = "https://rrqribkbvqgxpkylhxyd.supabase.co";
+        window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycXJpYmtidnFneHBreWxoeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4MzA1MDgsImV4cCI6MjA4MDQwNjUwOH0.DllabvxJhRdJVWL91xKugKDMBnZr-jFLuqE7pZguq-g";
+        window.SUPABASE_STORAGE_BUCKET = "site-media";
+        window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+            auth: { persistSession: false, autoRefreshToken: false }
+        });
     </script>
 
    <!-- JavaScript Files - ORDER MATTERS! -->
